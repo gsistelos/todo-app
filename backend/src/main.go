@@ -6,7 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/gsistelos/todo-app/controllers"
-	"github.com/gsistelos/todo-app/models"
+	_ "github.com/gsistelos/todo-app/models"
 	"net/http"
 	"os"
 )
@@ -39,8 +39,8 @@ func connectDB() *sql.DB {
 func createRouter() *mux.Router {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/users", controllers.getAllUsers).Methods("GET")
-	router.HandleFunc("/users/{id}", controllers.getUser).Methods("GET")
+	router.HandleFunc("/users", controllers.GetAllUsers).Methods("GET")
+	router.HandleFunc("/users/{id}", controllers.GetUser).Methods("GET")
 
 	return router
 }
