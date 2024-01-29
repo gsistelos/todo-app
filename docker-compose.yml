@@ -1,0 +1,23 @@
+networks:
+  todo_app:
+    name: todo_app
+
+volumes:
+  mysql_data:
+    name: mysql_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./mysql_data
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql
+    env_file: .env
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - todo_app
