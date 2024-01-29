@@ -21,3 +21,15 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - todo_app
+
+  backend:
+    container_name: backend
+    build: backend
+    env_file: .env
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - todo_app
+    depends_on:
+      - mysql
