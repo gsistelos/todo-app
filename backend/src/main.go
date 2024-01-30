@@ -21,11 +21,10 @@ func main() {
 }
 
 func connectDB() *sql.DB {
-	dbUser := os.Getenv("MYSQL_USER")
-	dbPassword := os.Getenv("MYSQL_PASSWORD")
+	dbPassword := os.Getenv("MYSQL_ROOT_PASSWORD")
 	dbName := os.Getenv("MYSQL_DATABASE")
 
-	connectionString := fmt.Sprintf("%s:%s@tcp(mysql:3306)/%s", dbUser, dbPassword, dbName)
+	connectionString := fmt.Sprintf("root:%s@tcp(mysql:3306)/%s", dbPassword, dbName)
 
 	db, err := sql.Open("mysql", connectionString)
 	if err != nil {

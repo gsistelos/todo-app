@@ -1,6 +1,6 @@
 networks:
-  todo_app:
-    name: todo_app
+  todo-app:
+    name: todo-app
 
 volumes:
   mysql_data:
@@ -20,7 +20,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - todo_app
+      - todo-app
 
   backend:
     container_name: backend
@@ -30,6 +30,6 @@ services:
     ports:
       - 8080:8080
     networks:
-      - todo_app
+      - todo-app
     depends_on:
       - mysql
