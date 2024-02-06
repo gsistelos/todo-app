@@ -52,6 +52,9 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 		}
 		users = append(users, user)
 	}
+	if err = rows.Err(); err != nil {
+        return &users, err
+    }
 
 	return &users, nil
 }
