@@ -32,11 +32,10 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error 
 
 	user, err := s.db.GetUser(id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return writeJSON(w, http.StatusNotFound, errJSON("User not found"))
+		}
 		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
-	}
-
-	if user == nil {
-		return writeJSON(w, http.StatusNotFound, errJSON("User not found"))
 	}
 
 	return writeJSON(w, http.StatusOK, user)
@@ -45,11 +44,10 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error 
 func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error {
 	users, err := s.db.GetUsers()
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return writeJSON(w, http.StatusNotFound, errJSON("No users found"))
+		}
 		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
-	}
-
-	if *users == nil {
-		return writeJSON(w, http.StatusNotFound, errJSON("No users found"))
 	}
 
 	return writeJSON(w, http.StatusOK, users)

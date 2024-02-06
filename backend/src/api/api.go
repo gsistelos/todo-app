@@ -24,9 +24,9 @@ func NewAPIServer(listenAddr string, db *db.MysqlDB) *APIServer {
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
+	router.HandleFunc("/users", makeHandlerFunc(s.handleCreateUser)).Methods("POST")
 	router.HandleFunc("/users", makeHandlerFunc(s.handleGetUsers)).Methods("GET")
 	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleGetUser)).Methods("GET")
-	router.HandleFunc("/users", makeHandlerFunc(s.handleCreateUser)).Methods("POST")
 	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleDeleteUser)).Methods("DELETE")
 
 	http.ListenAndServe(s.listenAddr, router)

@@ -28,9 +28,6 @@ func (s *MysqlDB) GetUser(id string) (*models.User, error) {
 	var user models.User
 	if err := s.db.QueryRow("SELECT * FROM users WHERE id = ?", id).
 		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
 		return nil, err
 	}
 
@@ -54,6 +51,10 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	}
 	if err = rows.Err(); err != nil {
 		return &users, err
+	}
+
+	if users == nil {
+		return nil, sql.ErrNoRows
 	}
 
 	return &users, nil
