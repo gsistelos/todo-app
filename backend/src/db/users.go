@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/gsistelos/todo-app/models"
 )
 
@@ -75,8 +76,18 @@ func (s *MysqlDB) DeleteUser(id string) error {
 }
 
 func (s *MysqlDB) createUsersTable() error {
+	exists, err := s.doTableExists("users")
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		fmt.Println("Table 'users' already exists")
+		return nil
+	}
+
 	query := `
-	CREATE TABLE IF NOT EXISTS users (
+	CREATE TABLE users (
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		username VARCHAR(255) NOT NULL CHECK (username <> ''),
 		email VARCHAR(255) NOT NULL UNIQUE CHECK (email <> ''),
@@ -84,6 +95,12 @@ func (s *MysqlDB) createUsersTable() error {
 	)
 	`
 
-	_, err := s.db.Exec(query)
-	return err
+	_, err = s.db.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Table 'users' created")
+
+	return nil
 }

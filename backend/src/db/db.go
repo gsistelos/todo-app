@@ -39,3 +39,15 @@ func (s *MysqlDB) Init() error {
 
 	return nil
 }
+
+func (s *MysqlDB) doTableExists(table string) (bool, error) {
+	query := fmt.Sprintf("SHOW TABLES LIKE '%s'", table)
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	return rows.Next(), nil
+}
