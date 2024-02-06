@@ -59,6 +59,20 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	return &users, nil
 }
 
+func (s *MysqlDB) DeleteUser(id string) error {
+	result, err := s.db.Exec("DELETE FROM users WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
 func (s *MysqlDB) createUsersTable() error {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/gsistelos/todo-app/models"
@@ -52,4 +53,19 @@ func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error
 	}
 
 	return writeJSON(w, http.StatusOK, users)
+}
+
+func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := s.db.DeleteUser(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return writeJSON(w, http.StatusNotFound, errJSON("User not found"))
+		}
+		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
+	}
+
+	return writeJSON(w, http.StatusNoContent, nil)
 }
