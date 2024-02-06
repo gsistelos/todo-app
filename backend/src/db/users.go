@@ -26,7 +26,7 @@ func (s *MysqlDB) CreateUser(userReq *models.CreateUserReq) (*models.User, error
 
 func (s *MysqlDB) GetUser(id string) (*models.User, error) {
 	var user models.User
-	if err := s.db.QueryRow("SELECT id, username, email, password FROM users WHERE id = ?", id).
+	if err := s.db.QueryRow("SELECT * FROM users WHERE id = ?", id).
 		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -38,7 +38,7 @@ func (s *MysqlDB) GetUser(id string) (*models.User, error) {
 }
 
 func (s *MysqlDB) GetUsers() (*[]models.User, error) {
-	rows, err := s.db.Query("SELECT id, username, email, password FROM users")
+	rows, err := s.db.Query("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -47,14 +47,14 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	var users []models.User
 	for rows.Next() {
 		var user models.User
-		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
+		if err = rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
 	}
 	if err = rows.Err(); err != nil {
-        return &users, err
-    }
+		return &users, err
+	}
 
 	return &users, nil
 }
