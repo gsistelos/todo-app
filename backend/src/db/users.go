@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"github.com/gsistelos/todo-app/models"
 )
 
@@ -19,6 +20,19 @@ func (s *MysqlDB) CreateUser(userReq *models.CreateUserReq) (*models.User, error
 
 	id, _ := result.LastInsertId()
 	user.ID = int(id)
+
+	return &user, nil
+}
+
+func (s *MysqlDB) GetUser(id string) (*models.User, error) {
+	var user models.User
+	if err := s.db.QueryRow("SELECT id, username, email, password FROM users WHERE id = ?", id).
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
 
 	return &user, nil
 }

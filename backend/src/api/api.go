@@ -25,6 +25,7 @@ func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/users", makeHandlerFunc(s.handleGetUsers)).Methods("GET")
+	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleGetUser)).Methods("GET")
 	router.HandleFunc("/users", makeHandlerFunc(s.handleCreateUser)).Methods("POST")
 
 	http.ListenAndServe(s.listenAddr, router)
