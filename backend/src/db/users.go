@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gsistelos/todo-app/models"
+	"strconv"
 )
 
 func (s *MysqlDB) CreateUser(userReq *models.CreateUserReq) (*models.User, error) {
@@ -73,6 +74,28 @@ func (s *MysqlDB) DeleteUser(id string) error {
 	}
 
 	return nil
+}
+
+func (s *MysqlDB) UpdateUser(id string, userReq models.UpdateUserReq) (*models.User, error) {
+	result, err := s.db.Exec("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?",
+		userReq.Username, userReq.Email, userReq.Password, id)
+	if err != nil {
+		return nil, err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return nil, sql.ErrNoRows
+	}
+
+	idInt, _ := strconv.Atoi(id)
+
+	return &models.User{
+		ID:       idInt,
+		Username: userReq.Username,
+		Email:    userReq.Email,
+		Password: userReq.Password,
+	}, nil
 }
 
 func (s *MysqlDB) createUsersTable() error {

@@ -67,3 +67,27 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 
 	return writeJSON(w, http.StatusNoContent, nil)
 }
+
+func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	userReq := &models.UpdateUserReq{}
+	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
+		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
+	}
+
+	if err := userReq.Validate(); err != nil {
+		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
+	}
+
+	user, err := s.db.UpdateUser(id, *userReq)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return writeJSON(w, http.StatusNotModified, errJSON("User not modified"))
+		}
+		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
+	}
+
+	return writeJSON(w, http.StatusOK, user)
+}

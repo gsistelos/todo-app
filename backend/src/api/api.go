@@ -27,6 +27,7 @@ func (s *APIServer) Run() {
 	router.HandleFunc("/users", makeHandlerFunc(s.handleCreateUser)).Methods("POST")
 	router.HandleFunc("/users", makeHandlerFunc(s.handleGetUsers)).Methods("GET")
 	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleGetUser)).Methods("GET")
+	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleUpdateUser)).Methods("PUT")
 	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleDeleteUser)).Methods("DELETE")
 
 	http.ListenAndServe(s.listenAddr, router)
