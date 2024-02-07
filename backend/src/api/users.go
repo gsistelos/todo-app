@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gsistelos/todo-app/models"
 	"net/http"
+	"strconv"
 )
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
@@ -18,9 +19,16 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
 	}
 
-	user, err := s.db.CreateUser(userReq)
+	id, err := s.db.CreateUser(userReq)
 	if err != nil {
 		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
+	}
+
+	idStr := strconv.Itoa(int(id))
+
+	user, err := s.db.GetUser(idStr)
+	if err != nil {
+		return writeJSON(w, http.StatusNoContent, nil)
 	}
 
 	return writeJSON(w, http.StatusCreated, user)
@@ -81,12 +89,16 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
 	}
 
-	user, err := s.db.UpdateUser(id, *userReq)
-	if err != nil {
+	if err := s.db.UpdateUser(id, *userReq); err != nil {
 		if err == sql.ErrNoRows {
 			return writeJSON(w, http.StatusNotModified, errJSON("User not modified"))
 		}
 		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
+	}
+
+	user, err := s.db.GetUser(id)
+	if err != nil {
+		return writeJSON(w, http.StatusNoContent, nil)
 	}
 
 	return writeJSON(w, http.StatusOK, user)

@@ -4,26 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gsistelos/todo-app/models"
-	"strconv"
 )
 
-func (s *MysqlDB) CreateUser(userReq *models.CreateUserReq) (*models.User, error) {
+func (s *MysqlDB) CreateUser(userReq *models.CreateUserReq) (int64, error) {
 	result, err := s.db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
 		userReq.Username, userReq.Email, userReq.Password)
 	if err != nil {
-		return &models.User{}, err
-	}
-
-	user := models.User{
-		Username: userReq.Username,
-		Email:    userReq.Email,
-		Password: userReq.Password,
+		return 0, err
 	}
 
 	id, _ := result.LastInsertId()
-	user.ID = int(id)
-
-	return &user, nil
+	return id, err
 }
 
 func (s *MysqlDB) GetUser(id string) (*models.User, error) {
@@ -76,26 +67,19 @@ func (s *MysqlDB) DeleteUser(id string) error {
 	return nil
 }
 
-func (s *MysqlDB) UpdateUser(id string, userReq models.UpdateUserReq) (*models.User, error) {
+func (s *MysqlDB) UpdateUser(id string, userReq models.UpdateUserReq) error {
 	result, err := s.db.Exec("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?",
 		userReq.Username, userReq.Email, userReq.Password, id)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return nil, sql.ErrNoRows
+		return sql.ErrNoRows
 	}
 
-	idInt, _ := strconv.Atoi(id)
-
-	return &models.User{
-		ID:       idInt,
-		Username: userReq.Username,
-		Email:    userReq.Email,
-		Password: userReq.Password,
-	}, nil
+	return nil
 }
 
 func (s *MysqlDB) createUsersTable() error {
