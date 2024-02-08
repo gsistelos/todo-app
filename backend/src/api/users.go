@@ -21,6 +21,13 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
 	}
 
+	hashedPassword, err := hashPassword(userReq.Password)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
+	}
+
+	userReq.Password = hashedPassword
+
 	id, err := s.db.CreateUser(userReq)
 	if err != nil {
 		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
@@ -93,6 +100,13 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	if err := userReq.Validate(); err != nil {
 		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
 	}
+
+	hashedPassword, err := hashPassword(userReq.Password)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
+	}
+
+	userReq.Password = hashedPassword
 
 	if err := s.db.UpdateUser(id, *userReq); err != nil {
 		if errors.Is(err, db.NotFound) {

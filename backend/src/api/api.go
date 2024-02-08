@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/gsistelos/todo-app/db"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
@@ -31,6 +32,15 @@ func (s *APIServer) Run() {
 	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleDeleteUser)).Methods("DELETE")
 
 	http.ListenAndServe(s.listenAddr, router)
+}
+
+func hashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	return string(hashedPassword), nil
 }
 
 func errJSON(err string) map[string]string {
