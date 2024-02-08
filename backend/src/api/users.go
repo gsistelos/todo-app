@@ -1,12 +1,14 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/gsistelos/todo-app/models"
+	"errors"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"github.com/gsistelos/todo-app/db"
+	"github.com/gsistelos/todo-app/models"
 )
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
@@ -40,10 +42,11 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error 
 
 	user, err := s.db.GetUser(id)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, errJSON("User not found"))
+		} else {
+			return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 		}
-		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 	}
 
 	return writeJSON(w, http.StatusOK, user)
@@ -52,10 +55,11 @@ func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error 
 func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error {
 	users, err := s.db.GetUsers()
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, errJSON("No users found"))
+		} else {
+			return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 		}
-		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 	}
 
 	return writeJSON(w, http.StatusOK, users)
@@ -67,10 +71,11 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 
 	err := s.db.DeleteUser(id)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, errJSON("User not found"))
+		} else {
+			return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 		}
-		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 	}
 
 	return writeJSON(w, http.StatusNoContent, nil)
@@ -90,10 +95,13 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	}
 
 	if err := s.db.UpdateUser(id, *userReq); err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, db.NotFound) {
+			return writeJSON(w, http.StatusNotFound, errJSON("User not found"))
+		} else if errors.Is(err, db.NotModified) {
 			return writeJSON(w, http.StatusNotModified, errJSON("User not modified"))
+		} else {
+			return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 		}
-		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 	}
 
 	user, err := s.db.GetUser(id)

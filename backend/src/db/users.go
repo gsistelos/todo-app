@@ -2,8 +2,14 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/gsistelos/todo-app/models"
+)
+
+var (
+	NotFound    = fmt.Errorf("Not found")
+	NotModified = fmt.Errorf("Not modified")
 )
 
 func (s *MysqlDB) CreateUser(userReq *models.CreateUserReq) (int64, error) {
@@ -21,7 +27,11 @@ func (s *MysqlDB) GetUser(id string) (*models.User, error) {
 	var user models.User
 	if err := s.db.QueryRow("SELECT * FROM users WHERE id = ?", id).
 		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, NotFound
+		} else {
+			return nil, err
+		}
 	}
 
 	return &user, nil
@@ -47,7 +57,7 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	}
 
 	if users == nil {
-		return nil, sql.ErrNoRows
+		return nil, NotFound
 	}
 
 	return &users, nil
@@ -61,13 +71,19 @@ func (s *MysqlDB) DeleteUser(id string) error {
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return sql.ErrNoRows
+		return NotFound
 	}
 
 	return nil
 }
 
 func (s *MysqlDB) UpdateUser(id string, userReq models.UpdateUserReq) error {
+	if exits, err := s.userExists(id); err != nil {
+		return err
+	} else if !exits {
+		return NotFound
+	}
+
 	result, err := s.db.Exec("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?",
 		userReq.Username, userReq.Email, userReq.Password, id)
 	if err != nil {
@@ -76,10 +92,19 @@ func (s *MysqlDB) UpdateUser(id string, userReq models.UpdateUserReq) error {
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return sql.ErrNoRows
+		return NotModified
 	}
 
 	return nil
+}
+
+func (s *MysqlDB) userExists(id string) (bool, error) {
+	var exists bool
+	if err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)", id).Scan(&exists); err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
 
 func (s *MysqlDB) createUsersTable() error {
