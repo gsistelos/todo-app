@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -14,7 +15,11 @@ import (
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
 	userReq := &models.CreateUserReq{}
 	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
-		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
+		if errors.Is(err, io.EOF) {
+			return writeJSON(w, http.StatusBadRequest, errJSON("Missing request body"))
+		} else {
+			return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
+		}
 	}
 
 	if err := userReq.Validate(); err != nil {
@@ -89,12 +94,13 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 }
 
 func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
 	userReq := &models.UpdateUserReq{}
 	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
-		return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
+		if errors.Is(err, io.EOF) {
+			return writeJSON(w, http.StatusBadRequest, errJSON("Missing request body"))
+		} else {
+			return writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
+		}
 	}
 
 	if err := userReq.Validate(); err != nil {
@@ -107,6 +113,9 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	}
 
 	userReq.Password = hashedPassword
+
+	vars := mux.Vars(r)
+	id := vars["id"]
 
 	if err := s.db.UpdateUser(id, *userReq); err != nil {
 		if errors.Is(err, db.NotFound) {
