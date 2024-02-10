@@ -48,3 +48,11 @@ func (s *UpdateUserReq) Validate() error {
 	}
 	return nil
 }
+
+func NewUser(username, password, email string) *User {
+	return &User{
+		Username: username,
+		Password: password,
+		Email:    email,
+	}
+}

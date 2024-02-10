@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/gsistelos/todo-app/db"
@@ -39,17 +38,13 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 
 	userReq.Password = hashedPassword
 
-	id, err := s.db.CreateUser(userReq)
+	user := models.NewUser(userReq.Username, userReq.Password, userReq.Email)
+	id, err := s.db.CreateUser(user)
 	if err != nil {
 		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))
 	}
 
-	idStr := strconv.Itoa(int(id))
-
-	user, err := s.db.GetUser(idStr)
-	if err != nil {
-		return writeJSON(w, http.StatusNoContent, nil)
-	}
+	user.ID = int(id)
 
 	return writeJSON(w, http.StatusCreated, user)
 }

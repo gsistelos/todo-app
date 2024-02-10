@@ -12,9 +12,9 @@ var (
 	NotModified = fmt.Errorf("Not modified")
 )
 
-func (s *MysqlDB) CreateUser(userReq *models.CreateUserReq) (int64, error) {
+func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
 	result, err := s.db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-		userReq.Username, userReq.Email, userReq.Password)
+		user.Username, user.Email, user.Password)
 	if err != nil {
 		return 0, err
 	}
