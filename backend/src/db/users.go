@@ -37,6 +37,20 @@ func (s *MysqlDB) GetUser(id string) (*models.User, error) {
 	return &user, nil
 }
 
+func (s *MysqlDB) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	if err := s.db.QueryRow("SELECT * FROM users WHERE email = ?", email).
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, NotFound
+		} else {
+			return nil, err
+		}
+	}
+
+	return &user, nil
+}
+
 func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	rows, err := s.db.Query("SELECT * FROM users")
 	if err != nil {
