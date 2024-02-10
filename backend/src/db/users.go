@@ -23,7 +23,7 @@ func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
 	return id, err
 }
 
-func (s *MysqlDB) GetUser(id string) (*models.User, error) {
+func (s *MysqlDB) GetUserByID(id string) (*models.User, error) {
 	var user models.User
 	if err := s.db.QueryRow("SELECT * FROM users WHERE id = ?", id).
 		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {

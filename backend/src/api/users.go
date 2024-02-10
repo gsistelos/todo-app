@@ -49,11 +49,11 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 	return writeJSON(w, http.StatusCreated, user)
 }
 
-func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) error {
+func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	user, err := s.db.GetUser(id)
+	user, err := s.db.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, errJSON("User not found"))
@@ -134,7 +134,7 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	user, err := s.db.GetUser(id)
+	user, err := s.db.GetUserByID(id)
 	if err != nil {
 		return writeJSON(w, http.StatusNoContent, nil)
 	}
