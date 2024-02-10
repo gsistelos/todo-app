@@ -38,7 +38,7 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 
 	userReq.Password = hashedPassword
 
-	user := models.NewUser(userReq.Username, userReq.Password, userReq.Email)
+	user := models.NewUser(userReq.Username, userReq.Email, userReq.Password)
 	id, err := s.db.CreateUser(user)
 	if err != nil {
 		return writeJSON(w, http.StatusInternalServerError, errJSON(err.Error()))

@@ -15,7 +15,7 @@ func NewMysqlDB() (*MysqlDB, error) {
 	dbPassword := os.Getenv("MYSQL_ROOT_PASSWORD")
 	dbName := os.Getenv("MYSQL_DATABASE")
 
-	db, err := sql.Open("mysql", fmt.Sprintf("root:%s@tcp(mysql:3306)/%s", dbPassword, dbName))
+	db, err := sql.Open("mysql", fmt.Sprintf("root:%s@tcp(mysql:3306)/%s?parseTime=true", dbPassword, dbName))
 	if err != nil {
 		return nil, err
 	}

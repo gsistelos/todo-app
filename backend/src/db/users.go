@@ -13,8 +13,8 @@ var (
 )
 
 func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
-	result, err := s.db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-		user.Username, user.Email, user.Password)
+	result, err := s.db.Exec("INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)",
+		user.Username, user.Email, user.Password, user.CreatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -26,7 +26,7 @@ func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
 func (s *MysqlDB) GetUserByID(id string) (*models.User, error) {
 	var user models.User
 	if err := s.db.QueryRow("SELECT * FROM users WHERE id = ?", id).
-		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, NotFound
 		} else {
@@ -40,7 +40,7 @@ func (s *MysqlDB) GetUserByID(id string) (*models.User, error) {
 func (s *MysqlDB) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := s.db.QueryRow("SELECT * FROM users WHERE email = ?", email).
-		Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, NotFound
 		} else {
@@ -61,7 +61,7 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	var users []models.User
 	for rows.Next() {
 		var user models.User
-		if err = rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
+		if err = rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -137,7 +137,8 @@ func (s *MysqlDB) createUsersTable() error {
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		username VARCHAR(255) NOT NULL CHECK (username <> ''),
 		email VARCHAR(255) NOT NULL UNIQUE CHECK (email <> ''),
-		password VARCHAR(255) NOT NULL CHECK (password <> '')
+		password VARCHAR(255) NOT NULL CHECK (password <> ''),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)
 	`
 
