@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"github.com/gsistelos/todo-app/db"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
@@ -11,6 +10,10 @@ import (
 type APIServer struct {
 	listenAddr string
 	db         *db.MysqlDB
+}
+
+type apiError struct {
+	Error string `json:"error"`
 }
 
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
@@ -23,13 +26,13 @@ func NewAPIServer(listenAddr string, db *db.MysqlDB) *APIServer {
 }
 
 func (s *APIServer) Run() {
-	router := mux.NewRouter()
+	router := http.NewServeMux()
 
-	router.HandleFunc("/users", makeHandlerFunc(s.handleCreateUser)).Methods("POST")
-	router.HandleFunc("/users", makeHandlerFunc(s.handleGetUsers)).Methods("GET")
-	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleGetUserByID)).Methods("GET")
-	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleUpdateUser)).Methods("PUT")
-	router.HandleFunc("/users/{id}", makeHandlerFunc(s.handleDeleteUser)).Methods("DELETE")
+	router.HandleFunc("POST /users", makeHandlerFunc(s.handleCreateUser))
+	router.HandleFunc("GET /users", makeHandlerFunc(s.handleGetUsers))
+	router.HandleFunc("GET /users/{id}", makeHandlerFunc(s.handleGetUserByID))
+	router.HandleFunc("PUT /users/{id}", makeHandlerFunc(s.handleUpdateUser))
+	router.HandleFunc("DELETE /users/{id}", makeHandlerFunc(s.handleDeleteUser))
 
 	http.ListenAndServe(s.listenAddr, router)
 }
@@ -43,10 +46,6 @@ func hashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
-func errJSON(err string) map[string]string {
-	return map[string]string{"error": err}
-}
-
 func writeJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -56,7 +55,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) error {
 func makeHandlerFunc(f apiFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := f(w, r); err != nil {
-			writeJSON(w, http.StatusBadRequest, errJSON(err.Error()))
+			writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
 		}
 	}
 }
