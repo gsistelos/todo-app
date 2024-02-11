@@ -78,9 +78,14 @@ func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error
 }
 
 func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
 	id := r.PathValue("id")
 
-	err := s.db.DeleteUser(id)
+	user, err := s.db.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
@@ -89,10 +94,43 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
+	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+	} else if !authorized {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
+	err = s.db.DeleteUser(id)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+	}
+
 	return writeJSON(w, http.StatusNoContent, nil)
 }
 
 func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
+	id := r.PathValue("id")
+
+	user, err := s.db.GetUserByID(id)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+	} else if user == nil {
+		return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
+	}
+
+	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+	} else if !authorized {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
 	userReq := &models.UserReq{}
 	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
 		if errors.Is(err, io.EOF) {
@@ -119,8 +157,6 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 
 	userReq.Password = hashedPassword
 
-	id := r.PathValue("id")
-
 	if err := s.db.UpdateUser(id, *userReq); err != nil {
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
@@ -131,7 +167,7 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	user, err := s.db.GetUserByID(id)
+	user, err = s.db.GetUserByID(id)
 	if err != nil {
 		return writeJSON(w, http.StatusNoContent, nil)
 	}
@@ -166,7 +202,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
-	token, err := newJWT(user.Email, user.Password)
+	token, err := newJWT(loginReq.Email, loginReq.Password)
 	if err != nil {
 		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
 	}
