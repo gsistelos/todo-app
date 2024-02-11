@@ -28,11 +28,11 @@ func NewAPIServer(listenAddr string, db *db.MysqlDB) *APIServer {
 func (s *APIServer) Run() {
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /users", makeHandlerFunc(s.handleCreateUser))
-	router.HandleFunc("GET /users", makeHandlerFunc(s.handleGetUsers))
-	router.HandleFunc("GET /users/{id}", makeHandlerFunc(s.handleGetUserByID))
-	router.HandleFunc("PUT /users/{id}", makeHandlerFunc(s.handleUpdateUser))
-	router.HandleFunc("DELETE /users/{id}", makeHandlerFunc(s.handleDeleteUser))
+	router.HandleFunc("POST /users", defaultHandler(s.handleCreateUser))
+	router.HandleFunc("GET /users", defaultHandler(s.handleGetUsers))
+	router.HandleFunc("GET /users/{id}", defaultHandler(s.handleGetUserByID))
+	router.HandleFunc("PUT /users/{id}", defaultHandler(s.handleUpdateUser))
+	router.HandleFunc("DELETE /users/{id}", defaultHandler(s.handleDeleteUser))
 
 	http.ListenAndServe(s.listenAddr, router)
 }
@@ -52,7 +52,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) error {
 	return json.NewEncoder(w).Encode(v)
 }
 
-func makeHandlerFunc(f apiFunc) http.HandlerFunc {
+func defaultHandler(f apiFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := f(w, r); err != nil {
 			writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
