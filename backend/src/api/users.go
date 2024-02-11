@@ -11,7 +11,7 @@ import (
 )
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
-	userReq := &models.CreateUserReq{}
+	userReq := &models.UserReq{}
 	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
 		if errors.Is(err, io.EOF) {
 			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})
@@ -92,7 +92,7 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 }
 
 func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
-	userReq := &models.UpdateUserReq{}
+	userReq := &models.UserReq{}
 	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
 		if errors.Is(err, io.EOF) {
 			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})

@@ -91,7 +91,7 @@ func (s *MysqlDB) DeleteUser(id string) error {
 	return nil
 }
 
-func (s *MysqlDB) UpdateUser(id string, userReq models.UpdateUserReq) error {
+func (s *MysqlDB) UpdateUser(id string, userReq models.UserReq) error {
 	if exits, err := s.userExists(id); err != nil {
 		return err
 	} else if !exits {
