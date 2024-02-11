@@ -8,6 +8,7 @@ import (
 
 	"github.com/gsistelos/todo-app/db"
 	"github.com/gsistelos/todo-app/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
@@ -136,4 +137,39 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	}
 
 	return writeJSON(w, http.StatusOK, user)
+}
+
+func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
+	loginReq := &models.LoginReq{}
+	if err := json.NewDecoder(r.Body).Decode(loginReq); err != nil {
+		if errors.Is(err, io.EOF) {
+			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})
+		} else {
+			return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+		}
+	}
+
+	if err := loginReq.Validate(); err != nil {
+		return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+	}
+
+	user, err := s.db.GetUserByEmail(loginReq.Email)
+	if err != nil {
+		if errors.Is(err, db.NotFound) {
+			return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+		} else {
+			return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		}
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginReq.Password)); err != nil {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
+	token, err := newJWT(user.Email, user.Password)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+	}
+
+	return writeJSON(w, http.StatusOK, map[string]string{"token": token})
 }

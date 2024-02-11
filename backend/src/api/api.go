@@ -34,6 +34,8 @@ func (s *APIServer) Run() {
 	router.HandleFunc("PUT /users/{id}", defaultHandler(s.handleUpdateUser))
 	router.HandleFunc("DELETE /users/{id}", defaultHandler(s.handleDeleteUser))
 
+	router.HandleFunc("POST /login", defaultHandler(s.handleLogin))
+
 	http.ListenAndServe(s.listenAddr, router)
 }
 
