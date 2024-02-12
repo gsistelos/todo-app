@@ -62,6 +62,18 @@ func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) er
 		}
 	}
 
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		return writeJSON(w, http.StatusOK, user.ToUserInfo())
+	}
+
+	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
+	if err != nil {
+		return err
+	} else if !authorized {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
 	return writeJSON(w, http.StatusOK, user)
 }
 

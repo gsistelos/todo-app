@@ -51,17 +51,17 @@ func (s *MysqlDB) GetUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (s *MysqlDB) GetUsers() (*[]models.User, error) {
-	rows, err := s.db.Query("SELECT * FROM users")
+func (s *MysqlDB) GetUsers() (*[]models.UserInfo, error) {
+	rows, err := s.db.Query("SELECT id, username, created_at FROM users")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var users []models.User
+	var users []models.UserInfo
 	for rows.Next() {
-		var user models.User
-		if err = rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+		var user models.UserInfo
+		if err = rows.Scan(&user.ID, &user.Username, &user.CreatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
