@@ -28,12 +28,12 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 	if _, err := s.db.GetUserByEmail(userReq.Email); err == nil {
 		return writeJSON(w, http.StatusConflict, apiError{Error: "Email already in use"})
 	} else if !errors.Is(err, db.NotFound) {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	}
 
 	hashedPassword, err := hashPassword(userReq.Password)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	}
 
 	userReq.Password = hashedPassword
@@ -41,7 +41,7 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 	user := models.NewUser(userReq.Username, userReq.Email, userReq.Password)
 	id, err := s.db.CreateUser(user)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	}
 
 	user.ID = int(id)
@@ -57,7 +57,7 @@ func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) er
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else {
-			return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+			return err
 		}
 	}
 
@@ -70,7 +70,7 @@ func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "No users found"})
 		} else {
-			return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+			return err
 		}
 	}
 
@@ -90,20 +90,20 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else {
-			return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+			return err
 		}
 	}
 
 	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	} else if !authorized {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
 	err = s.db.DeleteUser(id)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	}
 
 	return writeJSON(w, http.StatusNoContent, nil)
@@ -119,14 +119,14 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 
 	user, err := s.db.GetUserByID(id)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	} else if user == nil {
 		return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 	}
 
 	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	} else if !authorized {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
@@ -147,12 +147,12 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	if _, err := s.db.GetUserByEmail(userReq.Email); err == nil {
 		return writeJSON(w, http.StatusConflict, apiError{Error: "Email already in use"})
 	} else if !errors.Is(err, db.NotFound) {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	}
 
 	hashedPassword, err := hashPassword(userReq.Password)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	}
 
 	userReq.Password = hashedPassword
@@ -163,7 +163,7 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		} else if errors.Is(err, db.NotModified) {
 			return writeJSON(w, http.StatusNotModified, apiError{Error: "User not modified"})
 		} else {
-			return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+			return err
 		}
 	}
 
@@ -194,7 +194,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 		} else {
-			return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+			return err
 		}
 	}
 
@@ -204,7 +204,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 
 	token, err := newJWT(loginReq.Email, loginReq.Password)
 	if err != nil {
-		return writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+		return err
 	}
 
 	return writeJSON(w, http.StatusOK, map[string]string{"token": token})
