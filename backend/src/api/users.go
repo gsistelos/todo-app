@@ -3,12 +3,12 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"io"
-	"net/http"
-
 	"github.com/gsistelos/todo-app/db"
 	"github.com/gsistelos/todo-app/models"
 	"golang.org/x/crypto/bcrypt"
+	"io"
+	"net/http"
+	"strconv"
 )
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
@@ -25,26 +25,27 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 		return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
 	}
 
-	if _, err := s.db.GetUserByEmail(userReq.Email); err == nil {
+	if exists, err := s.db.UserEmailExists(userReq.Email); err != nil {
+		return err
+	} else if exists {
 		return writeJSON(w, http.StatusConflict, apiError{Error: "Email already in use"})
-	} else if !errors.Is(err, db.NotFound) {
+	}
+
+	if err := userReq.HashPassword(); err != nil {
 		return err
 	}
 
-	hashedPassword, err := hashPassword(userReq.Password)
+	id, err := s.db.CreateUser(userReq)
 	if err != nil {
 		return err
 	}
 
-	userReq.Password = hashedPassword
+	idStr := strconv.FormatInt(id, 10)
 
-	user := models.NewUser(userReq.Username, userReq.Email, userReq.Password)
-	id, err := s.db.CreateUser(user)
+	user, err := s.db.GetUserByID(idStr)
 	if err != nil {
-		return err
+		return writeJSON(w, http.StatusCreated, apiError{Error: "Failed to retrieve"})
 	}
-
-	user.ID = int(id)
 
 	return writeJSON(w, http.StatusCreated, user)
 }
@@ -140,24 +141,19 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	if err := userReq.Validate(); err != nil {
-		return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+	if userReq.Email != user.Email {
+		if exists, err := s.db.UserEmailExists(userReq.Email); err != nil {
+			return err
+		} else if exists {
+			return writeJSON(w, http.StatusConflict, apiError{Error: "Email already in use"})
+		}
 	}
 
-	if _, err := s.db.GetUserByEmail(userReq.Email); err == nil {
-		return writeJSON(w, http.StatusConflict, apiError{Error: "Email already in use"})
-	} else if !errors.Is(err, db.NotFound) {
+	if err := userReq.HashPassword(); err != nil {
 		return err
 	}
 
-	hashedPassword, err := hashPassword(userReq.Password)
-	if err != nil {
-		return err
-	}
-
-	userReq.Password = hashedPassword
-
-	if err := s.db.UpdateUser(id, *userReq); err != nil {
+	if err := s.db.UpdateUser(id, userReq); err != nil {
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else if errors.Is(err, db.NotModified) {
@@ -169,7 +165,7 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 
 	user, err = s.db.GetUserByID(id)
 	if err != nil {
-		return writeJSON(w, http.StatusNoContent, nil)
+		return writeJSON(w, http.StatusOK, apiError{Error: "Failed to retrieve"})
 	}
 
 	return writeJSON(w, http.StatusOK, user)
@@ -202,10 +198,10 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
-	token, err := newJWT(loginReq.Email, loginReq.Password)
+	tokenString, err := newJWT(loginReq.Email, loginReq.Password)
 	if err != nil {
 		return err
 	}
 
-	return writeJSON(w, http.StatusOK, map[string]string{"token": token})
+	return writeJSON(w, http.StatusOK, map[string]string{"token": tokenString})
 }

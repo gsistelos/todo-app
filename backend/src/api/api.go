@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"github.com/gsistelos/todo-app/db"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
@@ -37,15 +36,6 @@ func (s *APIServer) Run() {
 	router.HandleFunc("POST /login", defaultHandler(s.handleLogin))
 
 	http.ListenAndServe(s.listenAddr, router)
-}
-
-func hashPassword(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-
-	return string(hashedPassword), nil
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) error {

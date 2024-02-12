@@ -12,9 +12,9 @@ var (
 	NotModified = fmt.Errorf("Not modified")
 )
 
-func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
-	result, err := s.db.Exec("INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)",
-		user.Username, user.Email, user.Password, user.CreatedAt)
+func (s *MysqlDB) CreateUser(userReq *models.UserReq) (int64, error) {
+	result, err := s.db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+		userReq.Username, userReq.Email, userReq.Password)
 	if err != nil {
 		return 0, err
 	}
@@ -91,13 +91,7 @@ func (s *MysqlDB) DeleteUser(id string) error {
 	return nil
 }
 
-func (s *MysqlDB) UpdateUser(id string, userReq models.UserReq) error {
-	if exits, err := s.userExists(id); err != nil {
-		return err
-	} else if !exits {
-		return NotFound
-	}
-
+func (s *MysqlDB) UpdateUser(id string, userReq *models.UserReq) error {
 	result, err := s.db.Exec("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?",
 		userReq.Username, userReq.Email, userReq.Password, id)
 	if err != nil {
@@ -112,9 +106,18 @@ func (s *MysqlDB) UpdateUser(id string, userReq models.UserReq) error {
 	return nil
 }
 
-func (s *MysqlDB) userExists(id string) (bool, error) {
+func (s *MysqlDB) UserExists(id string) (bool, error) {
 	var exists bool
 	if err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)", id).Scan(&exists); err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}
+
+func (s *MysqlDB) UserEmailExists(email string) (bool, error) {
+	var exists bool
+	if err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)", email).Scan(&exists); err != nil {
 		return false, err
 	}
 

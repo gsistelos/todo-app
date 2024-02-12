@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserReq struct {
@@ -20,5 +21,15 @@ func (s *UserReq) Validate() error {
 	if s.Password == "" {
 		return fmt.Errorf("password is required")
 	}
+	return nil
+}
+
+func (s *UserReq) HashPassword() error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(s.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	s.Password = string(hashedPassword)
 	return nil
 }
