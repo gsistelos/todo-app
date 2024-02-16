@@ -12,7 +12,10 @@ type APIServer struct {
 }
 
 type apiError struct {
-	Error string `json:"error"`
+	Error    string `json:"error,omitempty"`
+	Username string `json:"username,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
@@ -27,13 +30,13 @@ func NewAPIServer(listenAddr string, db *db.MysqlDB) *APIServer {
 func (s *APIServer) Run() {
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /users", defaultHandler(s.handleCreateUser))
-	router.HandleFunc("GET /users", defaultHandler(s.handleGetUsers))
-	router.HandleFunc("GET /users/{id}", defaultHandler(s.handleGetUserByID))
-	router.HandleFunc("PUT /users/{id}", defaultHandler(s.handleUpdateUser))
-	router.HandleFunc("DELETE /users/{id}", defaultHandler(s.handleDeleteUser))
+	router.HandleFunc("POST /api/users", defaultHandler(s.handleCreateUser))
+	router.HandleFunc("GET /api/users", defaultHandler(s.handleGetUsers))
+	router.HandleFunc("GET /api/users/{id}", defaultHandler(s.handleGetUserByID))
+	router.HandleFunc("PUT /api/users/{id}", defaultHandler(s.handleUpdateUser))
+	router.HandleFunc("DELETE /api/users/{id}", defaultHandler(s.handleDeleteUser))
 
-	router.HandleFunc("POST /login", defaultHandler(s.handleLogin))
+	router.HandleFunc("POST /api/login", defaultHandler(s.handleLogin))
 
 	http.ListenAndServe(s.listenAddr, router)
 }

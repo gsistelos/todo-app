@@ -11,7 +11,7 @@ var (
 	jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 )
 
-func newJWT(email, password string) (string, error) {
+func newJWTSignedString(email, password string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"email":    email,
@@ -23,26 +23,28 @@ func newJWT(email, password string) (string, error) {
 	return tokenString, err
 }
 
-func authenticateJWT(email, password, tokenString string) (bool, error) {
+func compareJWTCredentials(email, password, tokenString string) error {
 	claims := jwt.MapClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+	jwtSecret, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
 	if err != nil {
-		return false, err
-	}
-
-	if !token.Valid {
-		return false, nil
+		return err
+	} else if !jwtSecret.Valid {
+		return jwt.ErrSignatureInvalid
 	}
 
 	if claims["email"] != email {
-		return false, nil
+		return jwt.ErrInvalidKey
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(password), []byte(claims["password"].(string))); err != nil {
-		return false, nil
+		return err
 	}
 
-	return true, nil
+	if time.Now().Unix() > int64(claims["exp"].(float64)) {
+		return jwt.ErrTokenExpired
+	}
+
+	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"net/http"
-	"strconv"
 )
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
@@ -21,31 +20,27 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	if err := userReq.Validate(); err != nil {
-		return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+	if reqErr := userReq.Validate(); reqErr != nil {
+		return writeJSON(w, http.StatusBadRequest, apiError{Username: reqErr.Username, Email: reqErr.Email, Password: reqErr.Password})
 	}
 
 	if exists, err := s.db.UserEmailExists(userReq.Email); err != nil {
 		return err
 	} else if exists {
-		return writeJSON(w, http.StatusConflict, apiError{Error: "Email already in use"})
+		return writeJSON(w, http.StatusConflict, apiError{Email: "Email already in use"})
 	}
 
-	if err := userReq.HashPassword(); err != nil {
-		return err
-	}
-
-	id, err := s.db.CreateUser(userReq)
+	user, err := models.NewUser(userReq.Username, userReq.Email, userReq.Password)
 	if err != nil {
 		return err
 	}
 
-	idStr := strconv.FormatInt(id, 10)
-
-	user, err := s.db.GetUserByID(idStr)
+	id, err := s.db.CreateUser(user)
 	if err != nil {
-		return writeJSON(w, http.StatusCreated, apiError{Error: "Failed to retrieve"})
+		return err
 	}
+
+	user.ID = int(id)
 
 	return writeJSON(w, http.StatusCreated, user)
 }
@@ -64,13 +59,11 @@ func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) er
 
 	tokenString := r.Header.Get("Authorization")
 	if tokenString == "" {
-		return writeJSON(w, http.StatusOK, user.ToUserInfo())
+		return writeJSON(w, http.StatusOK, user.OmitSensitive())
 	}
 
-	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
+	err = compareJWTCredentials(user.Email, user.Password, tokenString)
 	if err != nil {
-		return err
-	} else if !authorized {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
@@ -107,10 +100,8 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
+	err = compareJWTCredentials(user.Email, user.Password, tokenString)
 	if err != nil {
-		return err
-	} else if !authorized {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
@@ -137,10 +128,8 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 	}
 
-	authorized, err := authenticateJWT(user.Email, user.Password, tokenString)
+	err = compareJWTCredentials(user.Email, user.Password, tokenString)
 	if err != nil {
-		return err
-	} else if !authorized {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
@@ -157,15 +146,16 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		if exists, err := s.db.UserEmailExists(userReq.Email); err != nil {
 			return err
 		} else if exists {
-			return writeJSON(w, http.StatusConflict, apiError{Error: "Email already in use"})
+			return writeJSON(w, http.StatusConflict, apiError{Email: "Email already in use"})
 		}
 	}
 
-	if err := userReq.HashPassword(); err != nil {
+	err = user.Update(userReq.Username, userReq.Email, userReq.Password)
+	if err != nil {
 		return err
 	}
 
-	if err := s.db.UpdateUser(id, userReq); err != nil {
+	if err := s.db.UpdateUser(id, user); err != nil {
 		if errors.Is(err, db.NotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else if errors.Is(err, db.NotModified) {
@@ -173,11 +163,6 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		} else {
 			return err
 		}
-	}
-
-	user, err = s.db.GetUserByID(id)
-	if err != nil {
-		return writeJSON(w, http.StatusOK, apiError{Error: "Failed to retrieve"})
 	}
 
 	return writeJSON(w, http.StatusOK, user)
@@ -194,7 +179,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if err := loginReq.Validate(); err != nil {
-		return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+		return writeJSON(w, http.StatusBadRequest, err)
 	}
 
 	user, err := s.db.GetUserByEmail(loginReq.Email)
@@ -210,7 +195,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
-	tokenString, err := newJWT(loginReq.Email, loginReq.Password)
+	tokenString, err := newJWTSignedString(loginReq.Email, loginReq.Password)
 	if err != nil {
 		return err
 	}
