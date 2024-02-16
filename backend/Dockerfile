@@ -2,7 +2,7 @@ FROM golang:latest
 
 WORKDIR /app
 
-COPY src .
+COPY . ./
 
 RUN go build -o bin/todo-app
 
