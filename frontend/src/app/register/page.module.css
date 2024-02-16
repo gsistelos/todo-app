@@ -44,6 +44,11 @@
   padding: 1rem;
 }
 
+.error {
+  color: red;
+  font-size: 1rem;
+}
+
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
 }

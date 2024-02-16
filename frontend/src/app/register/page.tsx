@@ -1,43 +1,55 @@
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
+import { useRouter } from "next/navigation";
+import { useState, ChangeEvent, FormEvent } from "react";
+
+interface FormData {
+    username: string;
+    email: string;
+    password: string;
+}
 
 const Register: React.FC = () => {
     const router = useRouter();
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         username: "",
         email: "",
         password: "",
-        confirmPassword: "",
     });
+
+    const [formError, setFormError] = useState<FormData>({
+        username: "",
+        email: "",
+        password: "",
+    });
+
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match");
+        if (formData.password !== confirmPassword) {
+            setFormError({ username: "", email: "", password: "" });
+            setConfirmPasswordError("Passwords do not match");
             return;
         }
 
-        const postData = {
+        const postData: FormData = {
             username: formData.username,
             email: formData.email,
             password: formData.password,
         };
 
         try {
-            const response = await fetch("http://localhost:8080/users", {
+            const response = await fetch("http://localhost:8080/api/users", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -47,11 +59,12 @@ const Register: React.FC = () => {
 
             if (response.status !== 201) {
                 const data = await response.json();
-                throw new Error(data.error);
-            } else {
-                alert("User registered successfully");
-                router.push("/login");
+                setFormError(data);
+                return;
             }
+
+            alert("User created");
+            router.push("/login");
         } catch (error) {
             alert(error);
         }
@@ -60,7 +73,7 @@ const Register: React.FC = () => {
     return (
         <main className={styles.main}>
             <h1 className={styles.title}>Register</h1>
-            <p className={styles.paragraph}>This is the Register page</p>
+            <p className={styles.paragraph}>Create an account</p>
             <form className={styles.form} onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
                     <label>Username</label>
@@ -70,6 +83,7 @@ const Register: React.FC = () => {
                         value={formData.username}
                         onChange={handleChange}
                     />
+                    {formError.username && <p className={styles.error}>{formError.username}</p>}
                 </div>
                 <div className={styles.formGroup}>
                     <label>Email</label>
@@ -79,6 +93,7 @@ const Register: React.FC = () => {
                         value={formData.email}
                         onChange={handleChange}
                     />
+                    {formError.email && <p className={styles.error}>{formError.email}</p>}
                 </div>
                 <div className={styles.formGroup}>
                     <label>Password</label>
@@ -88,15 +103,16 @@ const Register: React.FC = () => {
                         value={formData.password}
                         onChange={handleChange}
                     />
+                    {formError.password && <p className={styles.error}>{formError.password}</p>}
                 </div>
                 <div className={styles.formGroup}>
                     <label>Confirm password</label>
                     <input
                         type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                     />
+                    {confirmPasswordError && <p className={styles.error}>{confirmPasswordError}</p>}
                 </div>
                 <button className={styles.button} type="submit">Register</button>
             </form>

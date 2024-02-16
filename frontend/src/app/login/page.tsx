@@ -1,35 +1,42 @@
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
+import { useRouter } from "next/navigation";
+import { useState, ChangeEvent, FormEvent } from "react";
+
+interface FormData {
+    email: string;
+    password: string;
+}
 
 const Login: React.FC = () => {
     const router = useRouter();
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
+        email: "",
+        password: "",
+    });
+
+    const [formError, setFormError] = useState<FormData>({
         email: "",
         password: "",
     });
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const postData = {
+        const postData: FormData = {
             email: formData.email,
             password: formData.password,
         };
 
         try {
-            const response = await fetch("http://localhost:8080/login", {
+            const response = await fetch("http://localhost:8080/api/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -39,10 +46,11 @@ const Login: React.FC = () => {
 
             if (response.status !== 200) {
                 const data = await response.json();
-                throw new Error(data.error);
-            } else {
-                router.push("/home");
+                setFormError(data);
+                return;
             }
+
+            router.push("/home");
         } catch (error) {
             alert(error);
         }
@@ -61,6 +69,7 @@ const Login: React.FC = () => {
                         value={formData.email}
                         onChange={handleChange}
                     />
+                    {formError.email && <p className={styles.error}>{formError.email}</p>}
                 </div>
                 <div className={styles.formGroup}>
                     <label>Password</label>
@@ -70,6 +79,7 @@ const Login: React.FC = () => {
                         value={formData.password}
                         onChange={handleChange}
                     />
+                    {formError.password && <p className={styles.error}>{formError.password}</p>}
                 </div>
                 <button className={styles.button} type="submit">Login</button>
             </form>
