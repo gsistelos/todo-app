@@ -33,3 +33,14 @@ services:
       - todo-app
     depends_on:
       - mysql
+
+  frontend:
+    container_name: frontend
+    build: frontend
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - todo-app
+    depends_on:
+      - backend
