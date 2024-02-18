@@ -6,7 +6,8 @@ import (
 )
 
 func (s *MysqlDB) CreateTask(task *models.Task) (int64, error) {
-	res, err := s.db.Exec("INSERT INTO tasks (user_id, description, done, created_at) VALUES (?, ?, ?, ?)", task.UserID, task.Description, task.Done, task.CreatedAt)
+	res, err := s.db.Exec("INSERT INTO tasks (user_id, description, done, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+		task.UserID, task.Description, task.Done, task.CreatedAt, task.UpdatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -15,8 +16,8 @@ func (s *MysqlDB) CreateTask(task *models.Task) (int64, error) {
 	return id, nil
 }
 
-func (s *MysqlDB) GetTasks(id string) (*[]models.Task, error) {
-	rows, err := s.db.Query("SELECT * FROM tasks WHERE user_id = ?", id)
+func (s *MysqlDB) GetTasks(userID string) (*[]models.Task, error) {
+	rows, err := s.db.Query("SELECT * FROM tasks WHERE user_id = ?", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +26,7 @@ func (s *MysqlDB) GetTasks(id string) (*[]models.Task, error) {
 	var tasks []models.Task
 	for rows.Next() {
 		var task models.Task
-		if err = rows.Scan(&task.ID, &task.UserID, &task.Description, &task.Done, &task.CreatedAt); err != nil {
+		if err = rows.Scan(&task.ID, &task.UserID, &task.Description, &task.Done, &task.CreatedAt, &task.UpdatedAt); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -58,7 +59,8 @@ func (s *MysqlDB) createTasksTable() error {
 		user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 		description VARCHAR(255) NOT NULL CHECK (description <> ''),
 		done BOOLEAN NOT NULL DEFAULT FALSE,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	)
 	`
 

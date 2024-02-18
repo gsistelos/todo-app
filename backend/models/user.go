@@ -11,6 +11,7 @@ type User struct {
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"password,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type UserReq struct {
@@ -30,11 +31,14 @@ func NewUser(username, email, password string) (*User, error) {
 		return nil, err
 	}
 
+	now := time.Now().UTC()
+
 	return &User{
 		Username:  username,
 		Email:     email,
 		Password:  string(hashedPassword),
-		CreatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}, nil
 }
 
@@ -50,6 +54,7 @@ func (s *User) Update(username, email, password string) error {
 
 	s.Username = username
 	s.Email = email
+	s.UpdatedAt = time.Now().UTC()
 
 	return nil
 }
@@ -64,6 +69,7 @@ func (s *User) OmitSensitive() *User {
 
 func (s *UserReq) Validate() *UserReq {
 	err := UserReq{}
+
 	if s.Username == "" {
 		err.Username = "Username is required"
 	}
@@ -87,6 +93,7 @@ func (s *UserReq) Validate() *UserReq {
 
 func (s *LoginReq) Validate() *LoginReq {
 	err := LoginReq{}
+
 	if s.Email == "" {
 		err.Email = "Email is required"
 	}

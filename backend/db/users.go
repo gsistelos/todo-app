@@ -8,8 +8,8 @@ import (
 )
 
 func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
-	result, err := s.db.Exec("INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)",
-		user.Username, user.Email, user.Password, user.CreatedAt)
+	result, err := s.db.Exec("INSERT INTO users (username, email, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+		user.Username, user.Email, user.Password, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -21,7 +21,7 @@ func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
 func (s *MysqlDB) GetUserByID(id string) (*models.User, error) {
 	var user models.User
 	if err := s.db.QueryRow("SELECT * FROM users WHERE id = ?", id).
-		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, NotFound
 		} else {
@@ -35,7 +35,7 @@ func (s *MysqlDB) GetUserByID(id string) (*models.User, error) {
 func (s *MysqlDB) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := s.db.QueryRow("SELECT * FROM users WHERE email = ?", email).
-		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, NotFound
 		} else {
@@ -47,7 +47,7 @@ func (s *MysqlDB) GetUserByEmail(email string) (*models.User, error) {
 }
 
 func (s *MysqlDB) GetUsers() (*[]models.User, error) {
-	rows, err := s.db.Query("SELECT id, username, created_at FROM users")
+	rows, err := s.db.Query("SELECT id, username, created_at, updated_at FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	var users []models.User
 	for rows.Next() {
 		var user models.User
-		if err = rows.Scan(&user.ID, &user.Username, &user.CreatedAt); err != nil {
+		if err = rows.Scan(&user.ID, &user.Username, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -87,8 +87,8 @@ func (s *MysqlDB) DeleteUser(id string) error {
 }
 
 func (s *MysqlDB) UpdateUser(id string, user *models.User) error {
-	result, err := s.db.Exec("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?",
-		user.Username, user.Email, user.Password, id)
+	result, err := s.db.Exec("UPDATE users SET username = ?, email = ?, password = ?, updated_at = ? WHERE id = ?",
+		user.Username, user.Email, user.Password, user.UpdatedAt, id)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,8 @@ func (s *MysqlDB) UpdateUser(id string, user *models.User) error {
 
 func (s *MysqlDB) UserExists(id string) (bool, error) {
 	var exists bool
-	if err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)", id).Scan(&exists); err != nil {
+	if err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)", id).
+		Scan(&exists); err != nil {
 		return false, err
 	}
 
@@ -112,7 +113,8 @@ func (s *MysqlDB) UserExists(id string) (bool, error) {
 
 func (s *MysqlDB) UserEmailExists(email string) (bool, error) {
 	var exists bool
-	if err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)", email).Scan(&exists); err != nil {
+	if err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)", email).
+		Scan(&exists); err != nil {
 		return false, err
 	}
 
@@ -136,7 +138,8 @@ func (s *MysqlDB) createUsersTable() error {
 		username VARCHAR(255) NOT NULL CHECK (username <> ''),
 		email VARCHAR(255) NOT NULL UNIQUE CHECK (email <> ''),
 		password VARCHAR(255) NOT NULL CHECK (password <> ''),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	)
 	`
 
