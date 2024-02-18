@@ -7,6 +7,11 @@ import (
 	"os"
 )
 
+var (
+	NotFound    = fmt.Errorf("Not found")
+	NotModified = fmt.Errorf("Not modified")
+)
+
 type MysqlDB struct {
 	db *sql.DB
 }
@@ -34,6 +39,10 @@ func NewMysqlDB() (*MysqlDB, error) {
 
 func (s *MysqlDB) Init() error {
 	if err := s.createUsersTable(); err != nil {
+		return err
+	}
+
+	if err := s.createTasksTable(); err != nil {
 		return err
 	}
 

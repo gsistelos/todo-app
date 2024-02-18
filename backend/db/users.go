@@ -7,11 +7,6 @@ import (
 	"github.com/gsistelos/todo-app/models"
 )
 
-var (
-	NotFound    = fmt.Errorf("Not found")
-	NotModified = fmt.Errorf("Not modified")
-)
-
 func (s *MysqlDB) CreateUser(user *models.User) (int64, error) {
 	result, err := s.db.Exec("INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)",
 		user.Username, user.Email, user.Password, user.CreatedAt)

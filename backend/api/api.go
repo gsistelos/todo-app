@@ -12,10 +12,7 @@ type APIServer struct {
 }
 
 type apiError struct {
-	Error    string `json:"error,omitempty"`
-	Username string `json:"username,omitempty"`
-	Email    string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
+	Error string `json:"error,omitempty"`
 }
 
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
@@ -37,6 +34,9 @@ func (s *APIServer) Run() {
 	router.HandleFunc("DELETE /api/users/{id}", defaultHandler(s.handleDeleteUser))
 
 	router.HandleFunc("POST /api/login", defaultHandler(s.handleLogin))
+
+	router.HandleFunc("POST /api/users/{id}/tasks", defaultHandler(s.handleCreateTask))
+	router.HandleFunc("GET /api/users/{id}/tasks", defaultHandler(s.handleGetTasks))
 
 	http.ListenAndServe(s.listenAddr, router)
 }
