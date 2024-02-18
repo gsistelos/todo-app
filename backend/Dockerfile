@@ -10,4 +10,6 @@ RUN go build -o bin/todo-app
 RUN curl -fsSLO https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
 RUN chmod +x wait-for-it.sh
 
-ENTRYPOINT ["./wait-for-it.sh", "mysql:3306", "--", "./bin/todo-app"]
+ENV MYSQL_ADDRESS "mysql:3306"
+
+ENTRYPOINT ["./wait-for-it.sh", "mysql:3306", "-s", "-t", "180", "--", "./bin/todo-app"]

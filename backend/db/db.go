@@ -18,9 +18,10 @@ type MysqlDB struct {
 
 func NewMysqlDB() (*MysqlDB, error) {
 	dbPassword := os.Getenv("MYSQL_ROOT_PASSWORD")
+	dbAddress := os.Getenv("MYSQL_ADDRESS")
 	dbName := os.Getenv("MYSQL_DATABASE")
 
-	db, err := sql.Open("mysql", fmt.Sprintf("root:%s@tcp(mysql:3306)/%s?parseTime=true", dbPassword, dbName))
+	db, err := sql.Open("mysql", fmt.Sprintf("root:%s@tcp(%s)/%s?parseTime=true", dbPassword, dbAddress, dbName))
 	if err != nil {
 		return nil, err
 	}
