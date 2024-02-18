@@ -20,14 +20,14 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	if reqErr := userReq.Validate(); reqErr != nil {
-		return writeJSON(w, http.StatusBadRequest, reqErr)
+	if userErr := userReq.Validate(); userErr != nil {
+		return writeJSON(w, http.StatusBadRequest, userErr)
 	}
 
 	if exists, err := s.db.UserEmailExists(userReq.Email); err != nil {
 		return err
 	} else if exists {
-		return writeJSON(w, http.StatusConflict, models.UserReq{Email: "Email already in use"})
+		return writeJSON(w, http.StatusConflict, models.UserErr{Email: "Email already in use"})
 	}
 
 	user, err := models.NewUser(userReq.Username, userReq.Email, userReq.Password)
@@ -146,7 +146,7 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 		if exists, err := s.db.UserEmailExists(userReq.Email); err != nil {
 			return err
 		} else if exists {
-			return writeJSON(w, http.StatusConflict, models.UserReq{Email: "Email already in use"})
+			return writeJSON(w, http.StatusConflict, models.UserErr{Email: "Email already in use"})
 		}
 	}
 
@@ -178,8 +178,8 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	if err := loginReq.Validate(); err != nil {
-		return writeJSON(w, http.StatusBadRequest, err)
+	if loginErr := loginReq.Validate(); loginErr != nil {
+		return writeJSON(w, http.StatusBadRequest, loginErr)
 	}
 
 	user, err := s.db.GetUserByEmail(loginReq.Email)

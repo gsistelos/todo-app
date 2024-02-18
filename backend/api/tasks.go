@@ -40,13 +40,13 @@ func (s *APIServer) handleCreateTask(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	if reqErr := taskReq.Validate(); reqErr != nil {
-		return writeJSON(w, http.StatusBadRequest, reqErr)
+	if taskErr := taskReq.Validate(); taskErr != nil {
+		return writeJSON(w, http.StatusBadRequest, taskErr)
 	}
 
 	userIDInt, _ := strconv.Atoi(userID)
 
-	task := models.NewTask(userIDInt, taskReq.Description)
+	task := models.NewTask(userIDInt, taskReq.Description, taskReq.Term)
 
 	id, err := s.db.CreateTask(task)
 	if err != nil {

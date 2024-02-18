@@ -15,12 +15,23 @@ type User struct {
 }
 
 type UserReq struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UserErr struct {
 	Username string `json:"username,omitempty"`
 	Email    string `json:"email,omitempty"`
 	Password string `json:"password,omitempty"`
 }
 
 type LoginReq struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginErr struct {
 	Email    string `json:"email,omitempty"`
 	Password string `json:"password,omitempty"`
 }
@@ -67,43 +78,43 @@ func (s *User) OmitSensitive() *User {
 	}
 }
 
-func (s *UserReq) Validate() *UserReq {
-	err := UserReq{}
+func (s *UserReq) Validate() *UserErr {
+	userErr := UserErr{}
 
 	if s.Username == "" {
-		err.Username = "Username is required"
+		userErr.Username = "Username is required"
 	}
 
 	if s.Email == "" {
-		err.Email = "Email is required"
+		userErr.Email = "Email is required"
 	}
 
 	if s.Password == "" {
-		err.Password = "Password is required"
+		userErr.Password = "Password is required"
 	} else if len(s.Password) < 8 {
-		err.Password = "Password must be at least 8 characters"
+		userErr.Password = "Password must be at least 8 characters"
 	}
 
-	if err != (UserReq{}) {
-		return &err
+	if userErr != (UserErr{}) {
+		return &userErr
 	}
 
 	return nil
 }
 
-func (s *LoginReq) Validate() *LoginReq {
-	err := LoginReq{}
+func (s *LoginReq) Validate() *LoginErr {
+	loginErr := LoginErr{}
 
 	if s.Email == "" {
-		err.Email = "Email is required"
+		loginErr.Email = "Email is required"
 	}
 
 	if s.Password == "" {
-		err.Password = "Password is required"
+		loginErr.Password = "Password is required"
 	}
 
-	if err != (LoginReq{}) {
-		return &err
+	if loginErr != (LoginErr{}) {
+		return &loginErr
 	}
 
 	return nil
