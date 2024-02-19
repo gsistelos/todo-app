@@ -43,6 +43,20 @@ func (s *MysqlDB) GetTasks(userID string) (*[]models.Task, error) {
 	return &tasks, nil
 }
 
+func (s *MysqlDB) DeleteTask(userID, taskID string) error {
+	result, err := s.db.Exec("DELETE FROM tasks WHERE user_id = ? AND id = ?", userID, taskID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}
+
 func (s *MysqlDB) createTasksTable() error {
 	exists, err := s.doTableExists("tasks")
 	if err != nil {

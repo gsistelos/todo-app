@@ -12,7 +12,7 @@ import (
 )
 
 func (s *APIServer) handleCreateTask(w http.ResponseWriter, r *http.Request) error {
-	userID := r.PathValue("id")
+	userID := r.PathValue("userID")
 
 	user, err := s.db.GetUserByID(userID)
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *APIServer) handleCreateTask(w http.ResponseWriter, r *http.Request) err
 }
 
 func (s *APIServer) handleGetTasks(w http.ResponseWriter, r *http.Request) error {
-	userID := r.PathValue("id")
+	userID := r.PathValue("userID")
 
 	user, err := s.db.GetUserByID(userID)
 	if err != nil {
@@ -90,4 +90,39 @@ func (s *APIServer) handleGetTasks(w http.ResponseWriter, r *http.Request) error
 	}
 
 	return writeJSON(w, http.StatusOK, tasks)
+}
+
+func (s *APIServer) handleDeleteTask(w http.ResponseWriter, r *http.Request) error {
+	userID := r.PathValue("userID")
+
+	user, err := s.db.GetUserByID(userID)
+	if err != nil {
+		if errors.Is(err, db.ErrNotFound) {
+			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
+		} else {
+			return err
+		}
+	}
+
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
+	if err := compareJWTCredentials(user.Email, user.Password, tokenString); err != nil {
+		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+	}
+
+	taskID := r.PathValue("taskID")
+
+	err = s.db.DeleteTask(userID, taskID)
+	if err != nil {
+		if errors.Is(err, db.ErrNotFound) {
+			return writeJSON(w, http.StatusNotFound, apiError{Error: "Task not found"})
+		} else {
+			return err
+		}
+	}
+
+	return writeJSON(w, http.StatusNoContent, nil)
 }

@@ -36,8 +36,9 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("POST /api/login", defaultHandler(s.handleLogin))
 
-	router.HandleFunc("POST /api/users/{id}/tasks", defaultHandler(s.handleCreateTask))
-	router.HandleFunc("GET /api/users/{id}/tasks", defaultHandler(s.handleGetTasks))
+	router.HandleFunc("POST /api/users/{userID}/tasks", defaultHandler(s.handleCreateTask))
+	router.HandleFunc("GET /api/users/{userID}/tasks", defaultHandler(s.handleGetTasks))
+	router.HandleFunc("DELETE /api/users/{userID}/tasks/{taskID}", defaultHandler(s.handleDeleteTask))
 
 	http.ListenAndServe(s.listenAddr, router)
 }
