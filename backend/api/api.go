@@ -2,8 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gsistelos/todo-app/db"
 	"net/http"
+
+	"github.com/gsistelos/todo-app/db"
 )
 
 type APIServer struct {

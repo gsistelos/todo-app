@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gsistelos/todo-app/api"
 	"github.com/gsistelos/todo-app/db"
-	"log"
 )
 
 func main() {

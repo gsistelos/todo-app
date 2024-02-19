@@ -3,11 +3,12 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+
 	"github.com/gsistelos/todo-app/db"
 	"github.com/gsistelos/todo-app/models"
 	"golang.org/x/crypto/bcrypt"
-	"io"
-	"net/http"
 )
 
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
@@ -50,7 +51,7 @@ func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) er
 
 	user, err := s.db.GetUserByID(id)
 	if err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else {
 			return err
@@ -73,7 +74,7 @@ func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) er
 func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error {
 	users, err := s.db.GetUsers()
 	if err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "No users found"})
 		} else {
 			return err
@@ -93,7 +94,7 @@ func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) err
 
 	user, err := s.db.GetUserByID(id)
 	if err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else {
 			return err
@@ -156,9 +157,9 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	}
 
 	if err := s.db.UpdateUser(id, user); err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
-		} else if errors.Is(err, db.NotModified) {
+		} else if errors.Is(err, db.ErrNotModified) {
 			return writeJSON(w, http.StatusNotModified, apiError{Error: "User not modified"})
 		} else {
 			return err
@@ -184,7 +185,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 
 	user, err := s.db.GetUserByEmail(loginReq.Email)
 	if err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 		} else {
 			return err

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/gsistelos/todo-app/models"
 )
 
@@ -23,7 +24,7 @@ func (s *MysqlDB) GetUserByID(id string) (*models.User, error) {
 	if err := s.db.QueryRow("SELECT * FROM users WHERE id = ?", id).
 		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, NotFound
+			return nil, ErrNotFound
 		} else {
 			return nil, err
 		}
@@ -37,7 +38,7 @@ func (s *MysqlDB) GetUserByEmail(email string) (*models.User, error) {
 	if err := s.db.QueryRow("SELECT * FROM users WHERE email = ?", email).
 		Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, NotFound
+			return nil, ErrNotFound
 		} else {
 			return nil, err
 		}
@@ -66,7 +67,7 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	}
 
 	if users == nil {
-		return nil, NotFound
+		return nil, ErrNotFound
 	}
 
 	return &users, nil
@@ -80,7 +81,7 @@ func (s *MysqlDB) DeleteUser(id string) error {
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return NotFound
+		return ErrNotFound
 	}
 
 	return nil
@@ -95,7 +96,7 @@ func (s *MysqlDB) UpdateUser(id string, user *models.User) error {
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return NotModified
+		return ErrNotModified
 	}
 
 	return nil

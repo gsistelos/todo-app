@@ -3,13 +3,14 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
-	NotFound    = fmt.Errorf("Not found")
-	NotModified = fmt.Errorf("Not modified")
+	ErrNotFound    = fmt.Errorf("Not found")
+	ErrNotModified = fmt.Errorf("Not modified")
 )
 
 type MysqlDB struct {

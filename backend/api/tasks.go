@@ -3,11 +3,12 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gsistelos/todo-app/db"
-	"github.com/gsistelos/todo-app/models"
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/gsistelos/todo-app/db"
+	"github.com/gsistelos/todo-app/models"
 )
 
 func (s *APIServer) handleCreateTask(w http.ResponseWriter, r *http.Request) error {
@@ -15,7 +16,7 @@ func (s *APIServer) handleCreateTask(w http.ResponseWriter, r *http.Request) err
 
 	user, err := s.db.GetUserByID(userID)
 	if err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else {
 			return err
@@ -63,7 +64,7 @@ func (s *APIServer) handleGetTasks(w http.ResponseWriter, r *http.Request) error
 
 	user, err := s.db.GetUserByID(userID)
 	if err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
 		} else {
 			return err
@@ -81,7 +82,7 @@ func (s *APIServer) handleGetTasks(w http.ResponseWriter, r *http.Request) error
 
 	tasks, err := s.db.GetTasks(userID)
 	if err != nil {
-		if errors.Is(err, db.NotFound) {
+		if errors.Is(err, db.ErrNotFound) {
 			return writeJSON(w, http.StatusNotFound, apiError{Error: "No tasks found"})
 		} else {
 			return err

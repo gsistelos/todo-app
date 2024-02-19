@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+
 	"github.com/gsistelos/todo-app/models"
 )
 
@@ -36,7 +37,7 @@ func (s *MysqlDB) GetTasks(userID string) (*[]models.Task, error) {
 	}
 
 	if tasks == nil {
-		return nil, NotFound
+		return nil, ErrNotFound
 	}
 
 	return &tasks, nil
