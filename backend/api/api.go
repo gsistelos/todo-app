@@ -30,15 +30,15 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("POST /api/users", defaultHandler(s.handleCreateUser))
 	router.HandleFunc("GET /api/users", defaultHandler(s.handleGetUsers))
-	router.HandleFunc("GET /api/users/{id}", defaultHandler(s.handleGetUserByID))
-	router.HandleFunc("PUT /api/users/{id}", defaultHandler(s.handleUpdateUser))
-	router.HandleFunc("DELETE /api/users/{id}", defaultHandler(s.handleDeleteUser))
+	router.HandleFunc("GET /api/users/{userID}", s.jwtHandler(s.handleGetUserByID))
+	router.HandleFunc("PUT /api/users/{userID}", s.jwtHandler(s.handleUpdateUser))
+	router.HandleFunc("DELETE /api/users/{userID}", s.jwtHandler(s.handleDeleteUser))
 
 	router.HandleFunc("POST /api/login", defaultHandler(s.handleLogin))
 
-	router.HandleFunc("POST /api/users/{userID}/tasks", defaultHandler(s.handleCreateTask))
-	router.HandleFunc("GET /api/users/{userID}/tasks", defaultHandler(s.handleGetTasks))
-	router.HandleFunc("DELETE /api/users/{userID}/tasks/{taskID}", defaultHandler(s.handleDeleteTask))
+	router.HandleFunc("POST /api/users/{userID}/tasks", s.jwtHandler(s.handleCreateTask))
+	router.HandleFunc("GET /api/users/{userID}/tasks", s.jwtHandler(s.handleGetTasks))
+	router.HandleFunc("DELETE /api/users/{userID}/tasks/{taskID}", s.jwtHandler(s.handleDeleteTask))
 
 	http.ListenAndServe(s.listenAddr, router)
 }
