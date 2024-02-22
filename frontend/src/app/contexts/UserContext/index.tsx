@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { User } from "../../types";
 import jwt from "jsonwebtoken";
 
-export const fetchUser = async () => {
+export const fetchUser = async (): Promise<User | null> => {
   try {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -26,7 +26,12 @@ export const fetchUser = async () => {
       return null;
     }
 
-    return await response.json();
+    const user = await response.json();
+
+    user.created_at = new Date(user.created_at);
+    user.updated_at = new Date(user.updated_at);
+
+    return user;
   } catch (error) {
     alert("An error occurred while fetching the user: " + error);
     return null;

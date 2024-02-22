@@ -12,8 +12,8 @@ const Home = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    fetchUser().then((data) => {
-      setUser(data);
+    fetchUser().then((user) => {
+      setUser(user);
       setLoaded(true);
     });
   }, []);
