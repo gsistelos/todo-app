@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	ErrNotFound    = fmt.Errorf("Not found")
-	ErrNotModified = fmt.Errorf("Not modified")
+	ErrNotFound    = fmt.Errorf("not found")
+	ErrNotModified = fmt.Errorf("not modified")
 )
 
 type MysqlDB struct {
