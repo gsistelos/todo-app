@@ -1,15 +1,23 @@
-.form {
+.formGroup {
   display: flex;
   flex-direction: column;
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 500px;
-  align-self: center;
+  margin-bottom: 2rem;
 }
 
-.button {
-  font-size: 2rem;
+.formGroup label {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.formGroup input {
+  font-size: 1.5rem;
   padding: 1rem;
+  border: 1px solid #fff;
+}
+
+.error {
+  color: red;
+  font-size: 1rem;
 }
 
 /* Enable hover only on non-touch devices */

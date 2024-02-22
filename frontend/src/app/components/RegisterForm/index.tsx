@@ -3,6 +3,7 @@
 import styles from "./RegisterForm.module.css";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import FormGroup from "../FormGroup";
 
 type FormData = {
   username: string;
@@ -72,51 +73,38 @@ const Register = () => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <div className={styles.formGroup}>
-        <label>Username</label>
-        <input
-          type="text"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-        />
-        {formError.username && (
-          <p className={styles.error}>{formError.username}</p>
-        )}
-      </div>
-      <div className={styles.formGroup}>
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        {formError.email && <p className={styles.error}>{formError.email}</p>}
-      </div>
-      <div className={styles.formGroup}>
-        <label>Password</label>
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        {formError.password && (
-          <p className={styles.error}>{formError.password}</p>
-        )}
-      </div>
-      <div className={styles.formGroup}>
-        <label>Confirm password</label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-        {confirmPasswordError && (
-          <p className={styles.error}>{confirmPasswordError}</p>
-        )}
-      </div>
+      <FormGroup
+        label="Username"
+        type="text"
+        name="username"
+        value={formData.username}
+        onChange={handleChange}
+        error={formError.username}
+      />
+      <FormGroup
+        label="Email"
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        error={formError.email}
+      />
+      <FormGroup
+        label="Password"
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        error={formError.password}
+      />
+      <FormGroup
+        label="Confirm Password"
+        type="password"
+        name="confirmPassword"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        error={confirmPasswordError}
+      />
       <button className={styles.button} type="submit">
         Register
       </button>
