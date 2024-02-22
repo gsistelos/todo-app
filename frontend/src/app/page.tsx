@@ -1,28 +1,14 @@
-"use client";
-
 import styles from "./page.module.css";
-import { useRouter } from "next/navigation";
+import Header from "./components/Header";
+import UserActions from "./components/UserActions";
 
-const Menu: React.FC = () => {
-  const router = useRouter();
-
+const Home = () => {
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>Menu</h1>
-      <p className={styles.paragraph}>This is the Menu page</p>
-      <div className={styles.container}>
-        <button
-          className={styles.button}
-          onClick={() => router.push("/register")}
-        >
-          Register
-        </button>
-        <button className={styles.button} onClick={() => router.push("/login")}>
-          Login
-        </button>
-      </div>
+      <Header title="Home" subtitle="todo-app" />
+      <UserActions />
     </main>
   );
 };
 
-export default Menu;
+export default Home;

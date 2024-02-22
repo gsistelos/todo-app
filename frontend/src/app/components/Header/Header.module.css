@@ -1,8 +1,16 @@
-.main {
+.header {
   display: flex;
   flex-direction: column;
-  padding: 6rem;
-  min-height: 100vh;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 3rem;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 400;
 }
 
 /* Enable hover only on non-touch devices */
