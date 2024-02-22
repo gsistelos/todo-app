@@ -1,8 +1,15 @@
-.main {
+.form {
   display: flex;
   flex-direction: column;
-  padding: 6rem;
-  min-height: 100vh;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 500px;
+  align-self: center;
+}
+
+.button {
+  font-size: 2rem;
+  padding: 1rem;
 }
 
 /* Enable hover only on non-touch devices */
