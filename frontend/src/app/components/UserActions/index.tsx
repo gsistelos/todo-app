@@ -2,21 +2,15 @@
 
 import styles from "./UserActions.module.css";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { UserContext } from "../../contexts/UserContext";
 
 const UserActions = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setLoggedIn(true);
-    }
-  }, []);
+  const { user, setUser } = useContext(UserContext);
 
   const router = useRouter();
 
-  return loggedIn ? (
+  return user ? (
     <div className={styles.container}>
       <button className={styles.button} onClick={() => router.push("/profile")}>
         Profile
@@ -25,7 +19,7 @@ const UserActions = () => {
         className={styles.button}
         onClick={() => {
           localStorage.removeItem("token");
-          setLoggedIn(false);
+          setUser(null);
         }}
       >
         Logout

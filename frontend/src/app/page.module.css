@@ -5,6 +5,14 @@
   min-height: 100vh;
 }
 
+.loading {
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
 }
