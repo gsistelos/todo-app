@@ -5,50 +5,6 @@
   min-height: 100vh;
 }
 
-.title {
-  font-size: 3rem;
-}
-
-.paragraph {
-  font-size: 1.5rem;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 500px;
-  align-self: center;
-}
-
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
-}
-
-.formGroup label {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.formGroup input {
-  font-size: 1.5rem;
-  padding: 1rem;
-  border: 1px solid #fff;
-}
-
-.button {
-  font-size: 2rem;
-  padding: 1rem;
-}
-
-.error {
-  color: red;
-  font-size: 1rem;
-}
-
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
 }
