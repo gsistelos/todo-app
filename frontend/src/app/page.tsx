@@ -1,41 +1,23 @@
 "use client";
 
-import styles from "./page.module.css";
+import { ThemeContext, createTheme } from "./contexts/Theme";
 import Header from "./components/Header";
-import UserActions from "./components/UserActions";
-import { UserContext, fetchUser } from "./contexts/UserContext";
-import { User } from "./types";
-import { useEffect, useState } from "react";
 
 const Home = () => {
-  const [loaded, setLoaded] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { lights, updateTheme } = createTheme();
 
-  useEffect(() => {
-    fetchUser().then((user) => {
-      setUser(user);
-      setLoaded(true);
-    });
-  }, []);
-
-  const value = { user, setUser };
+  const themeClasses = lights ? "bg-white text-black" : "bg-black text-white";
 
   return (
-    <main className={styles.main}>
-      {loaded ? (
-        <UserContext.Provider value={value}>
-          <Header
-            title="Home"
-            subtitle={
-              user ? `Welcome, ${user.username}!` : "You are not logged in."
-            }
-          />
-          <UserActions />
-        </UserContext.Provider>
-      ) : (
-        <span className={styles.loading}>Loading...</span>
-      )}
-    </main>
+    <ThemeContext.Provider value={{ lights, updateTheme }}>
+      <main className={`min-h-screen ${themeClasses}`}>
+        <Header title="Home" />
+        <div className="p-4">
+          <h1>Home</h1>
+          <span>This is the Home page</span>
+        </div>
+      </main>
+    </ThemeContext.Provider>
   );
 };
 
