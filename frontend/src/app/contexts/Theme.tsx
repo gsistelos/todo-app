@@ -8,7 +8,7 @@ export const ThemeContext = createContext({
 /*
  * "use client" is needed in order to use createTheme
  */
-export const createTheme = () => {
+export const ThemeValues = () => {
   const [lights, setLights] = useState(false);
 
   useEffect(() => {

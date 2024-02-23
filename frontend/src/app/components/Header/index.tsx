@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 import { useTheme } from "../../contexts/Theme";
-import { link } from "fs";
 
 type Props = {
   title: string;
@@ -35,7 +35,7 @@ const Header = ({ title }: Props) => {
       className={`flex items-center justify-between p-6 border-b ${headerTheme}`}
     >
       <div className="flex items-center justify-between">
-        <img className="mr-2" src={logo} alt="Logo" />
+        <Image className="mr-2" src={logo} alt="Logo" />
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
       <div className="flex justify-between">
@@ -55,7 +55,7 @@ const Header = ({ title }: Props) => {
           </ul>
         </nav>
         <button onClick={() => updateTheme()}>
-          <img src={buttonIcon} alt={buttonAlt} />
+          <Image src={buttonIcon} alt={buttonAlt} />
         </button>
       </div>
     </header>

@@ -1,10 +1,10 @@
 "use client";
 
-import { ThemeContext, createTheme } from "./contexts/Theme";
+import { ThemeContext, ThemeValues } from "./contexts/Theme";
 import Header from "./components/Header";
 
 const Home = () => {
-  const { lights, updateTheme } = createTheme();
+  const { lights, updateTheme } = ThemeValues();
 
   const themeClasses = lights ? "bg-white text-black" : "bg-black text-white";
 
