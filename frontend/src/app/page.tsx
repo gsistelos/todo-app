@@ -1,7 +1,7 @@
 "use client";
 
-import { ThemeContext, ThemeValues } from "./contexts/Theme";
 import Header from "./components/Header";
+import { ThemeContext, ThemeValues } from "./contexts/Theme";
 
 const Home = () => {
   const { lights, updateTheme } = ThemeValues();

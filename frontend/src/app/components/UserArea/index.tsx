@@ -1,8 +1,9 @@
-import { useTheme } from "../../contexts/Theme";
 import { useState } from "react";
+
+import { useTheme } from "../../contexts/Theme";
+import Login from "../Login";
 import Modal from "../Modal";
 import Register from "../Register";
-import Login from "../Login";
 
 const UserArea = () => {
   const { lights } = useTheme();

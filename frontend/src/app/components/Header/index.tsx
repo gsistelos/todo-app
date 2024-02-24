@@ -1,7 +1,8 @@
 import Image from "next/image";
-import UserArea from "../UserArea";
+
 import { useTheme } from "../../contexts/Theme";
 import ThemeSwitcher from "../ThemeSwitcher";
+import UserArea from "../UserArea";
 
 type Props = {
   title: string;
