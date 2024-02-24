@@ -9,18 +9,24 @@ type Props = {
 };
 
 const Header = ({ title }: Props) => {
-  const { lights, updateTheme } = useTheme();
+  const { lights } = useTheme();
 
-  const { header, logo } = lights
-    ? { header: "border-black", logo: "/dark-logo.png" }
-    : { header: "border-white", logo: "/light-logo.png" };
+  const { headerTheme, logoTheme } = lights
+    ? { headerTheme: "border-black", logoTheme: "/dark-logo.png" }
+    : { headerTheme: "border-white", logoTheme: "/light-logo.png" };
 
   return (
     <header
-      className={`flex items-center justify-between p-6 border-b ${header}`}
+      className={`flex items-center justify-between p-6 border-b ${headerTheme}`}
     >
-      <div className="flex items-center justify-between">
-        <Image className="mr-2" width={24} height={24} src={logo} alt="Logo" />
+      <div className="flex items-center">
+        <Image
+          className="mr-2"
+          width={24}
+          height={24}
+          src={logoTheme}
+          alt="Logo"
+        />
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
       <div className="flex items-center">

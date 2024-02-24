@@ -5,16 +5,24 @@ import { useTheme } from "../../contexts/Theme";
 const ThemeSwitcher = () => {
   const { lights, updateTheme } = useTheme();
 
-  const { hover, src, alt } = lights
-    ? { hover: "hover:bg-gray-200", src: "/dark.png", alt: "Dark icon" }
-    : { hover: "hover:bg-gray-800", src: "/light.png", alt: "Light icon" };
+  const { hoverTheme, srcTheme, altTheme } = lights
+    ? {
+        hoverTheme: "hover:bg-gray-200",
+        srcTheme: "/dark.png",
+        altTheme: "Dark icon",
+      }
+    : {
+        hoverTheme: "hover:bg-gray-800",
+        srcTheme: "/light.png",
+        altTheme: "Light icon",
+      };
 
   return (
     <button
-      className={`p-1 rounded-full ${hover}`}
+      className={`p-1 rounded-full ${hoverTheme}`}
       onClick={() => updateTheme()}
     >
-      <Image width={24} height={24} src={src} alt={alt} />
+      <Image width={24} height={24} src={srcTheme} alt={altTheme} />
     </button>
   );
 };
