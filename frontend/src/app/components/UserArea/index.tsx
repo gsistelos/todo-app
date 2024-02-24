@@ -9,11 +9,7 @@ const UserArea = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  const { lights } = useTheme();
-
-  const { hoverTheme, lineTheme } = lights
-    ? { hoverTheme: "hover:bg-gray-200", lineTheme: "border-black" }
-    : { hoverTheme: "hover:bg-gray-800", lineTheme: "border-white" };
+  const { borderColor, hoverColor } = useTheme();
 
   type Props = {
     children: React.ReactNode;
@@ -23,7 +19,7 @@ const UserArea = () => {
   const Button = ({ children, onClick }: Props) => {
     return (
       <button
-        className={`px-4 py-2 rounded-full ${hoverTheme}`}
+        className={`px-4 py-2 rounded-full ${hoverColor}`}
         onClick={onClick}
       >
         {children}
@@ -41,7 +37,7 @@ const UserArea = () => {
           </Modal>
         )}
       </li>
-      <div className={`border-l min-h-full mx-3 ${lineTheme}`}></div>
+      <div className={`min-h-full mx-3 border-l ${borderColor}`}></div>
       <li>
         <Button onClick={() => setIsLoginOpen(true)}>Login</Button>
         {isLoginOpen && (

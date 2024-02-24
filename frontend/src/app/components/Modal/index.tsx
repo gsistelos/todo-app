@@ -8,17 +8,9 @@ type Props = {
 };
 
 const Modal = ({ children, onClose }: Props) => {
-  const { lights } = useTheme();
+  const { theme, bgColor } = useTheme();
 
-  const { divTheme, srcTheme } = lights
-    ? {
-        divTheme: "bg-white border-black",
-        srcTheme: "/dark-close.png",
-      }
-    : {
-        divTheme: "bg-black border-white",
-        srcTheme: "/light-close.png",
-      };
+  const src = theme === "dark" ? "/light-close.png" : "/dark-close.png";
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-50">
@@ -27,9 +19,9 @@ const Modal = ({ children, onClose }: Props) => {
           className="p-2 ml-auto rounded-full hover:bg-red-500"
           onClick={onClose}
         >
-          <Image width={24} height={24} src={srcTheme} alt="Close" />
+          <Image width={24} height={24} src={src} alt="Close" />
         </button>
-        <div className={`p-8 mx-10 mb-10 border rounded shadow-lg ${divTheme}`}>
+        <div className={`p-8 mx-10 mb-10 ${bgColor} border rounded shadow-lg`}>
           {children}
         </div>
       </div>

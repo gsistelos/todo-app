@@ -9,17 +9,13 @@ type Props = {
 };
 
 const FormField = ({ className, label, type, name, onChange }: Props) => {
-  const { lights } = useTheme();
-
-  const input = lights
-    ? "text-black border-black bg-gray-200"
-    : "text-white border-white bg-gray-800";
+  const { textColor, bgSecondaryColor, borderColor } = useTheme();
 
   return (
     <div className={className}>
       <label className="font-medium">{label}</label>
       <input
-        className={`p-1.5 border ${input}`}
+        className={`p-1.5 ${textColor} ${bgSecondaryColor} border ${borderColor}`}
         type={type}
         name={name}
         onChange={onChange}

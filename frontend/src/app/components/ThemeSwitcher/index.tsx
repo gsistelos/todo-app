@@ -3,26 +3,25 @@ import Image from "next/image";
 import { useTheme } from "../../contexts/Theme";
 
 const ThemeSwitcher = () => {
-  const { lights, updateTheme } = useTheme();
+  const { theme, toggleTheme, hoverColor } = useTheme();
 
-  const { hoverTheme, srcTheme, altTheme } = lights
-    ? {
-        hoverTheme: "hover:bg-gray-200",
-        srcTheme: "/dark.png",
-        altTheme: "Dark icon",
-      }
-    : {
-        hoverTheme: "hover:bg-gray-800",
-        srcTheme: "/light.png",
-        altTheme: "Light icon",
-      };
+  const { src, alt } =
+    theme === "dark"
+      ? {
+          src: "/light.png",
+          alt: "Light icon",
+        }
+      : {
+          src: "/dark.png",
+          alt: "Dark icon",
+        };
 
   return (
     <button
-      className={`p-1 rounded-full ${hoverTheme}`}
-      onClick={() => updateTheme()}
+      className={`p-1 rounded-full ${hoverColor}`}
+      onClick={() => toggleTheme()}
     >
-      <Image width={24} height={24} src={srcTheme} alt={altTheme} />
+      <Image width={24} height={24} src={src} alt={alt} />
     </button>
   );
 };

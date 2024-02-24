@@ -8,26 +8,25 @@ type Props = {
 };
 
 const PasswordSwitcher = ({ show, onClick }: Props) => {
-  const { lights } = useTheme();
+  const { theme, hoverColor } = useTheme();
 
-  const { hover, showSrc, hideSrc } = lights
-    ? {
-        hover: "hover:bg-gray-200",
-        showSrc: "/dark-show-password.png",
-        hideSrc: "/dark-hide-password.png",
-      }
-    : {
-        hover: "hover:bg-gray-800",
-        showSrc: "/light-show-password.png",
-        hideSrc: "/light-hide-password.png",
-      };
+  const { srcShow, srcHide } =
+    theme === "dark"
+      ? {
+          srcShow: "/light-show-password.png",
+          srcHide: "/light-hide-password.png",
+        }
+      : {
+          srcShow: "/dark-show-password.png",
+          srcHide: "/dark-hide-password.png",
+        };
 
   return (
-    <button className={`p-1 rounded-full ${hover}`} onClick={onClick}>
+    <button className={`p-1 rounded-full ${hoverColor}`} onClick={onClick}>
       {show ? (
-        <Image width={24} height={24} src={showSrc} alt="Show password" />
+        <Image width={24} height={24} src={srcShow} alt="Show password" />
       ) : (
-        <Image width={24} height={24} src={hideSrc} alt="Hide password" />
+        <Image width={24} height={24} src={srcHide} alt="Hide password" />
       )}
     </button>
   );
