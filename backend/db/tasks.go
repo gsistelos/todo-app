@@ -1,6 +1,8 @@
 package db
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/gsistelos/todo-app/models"
@@ -41,6 +43,36 @@ func (s *MysqlDB) GetTasks(userID string) (*[]models.Task, error) {
 	}
 
 	return &tasks, nil
+}
+
+func (s *MysqlDB) GetTaskByID(userID, taskID string) (*models.Task, error) {
+	var task models.Task
+	err := s.db.QueryRow("SELECT * FROM tasks WHERE user_id = ? AND id = ?", userID, taskID).
+		Scan(&task.ID, &task.UserID, &task.Description, &task.Done, &task.Term, &task.CreatedAt, &task.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		} else {
+			return nil, err
+		}
+	}
+
+	return &task, nil
+}
+
+func (s *MysqlDB) UpdateTask(userID, taskID string, task *models.Task) error {
+	result, err := s.db.Exec("UPDATE tasks SET description = ?, done = ?, term = ?, updated_at = ? WHERE user_id = ? AND id = ?",
+		task.Description, task.Done, task.Term, task.UpdatedAt, userID, taskID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return ErrNotFound
+	}
+
+	return nil
 }
 
 func (s *MysqlDB) DeleteTask(userID, taskID string) error {

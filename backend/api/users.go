@@ -74,16 +74,6 @@ func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error
 	return writeJSON(w, http.StatusOK, users)
 }
 
-func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
-	userID := r.PathValue("userID")
-
-	if err := s.db.DeleteUser(userID); err != nil {
-		return err
-	}
-
-	return writeJSON(w, http.StatusNoContent, nil)
-}
-
 func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
 	userID := r.PathValue("userID")
 
@@ -128,6 +118,16 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	}
 
 	return writeJSON(w, http.StatusOK, user)
+}
+
+func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
+	userID := r.PathValue("userID")
+
+	if err := s.db.DeleteUser(userID); err != nil {
+		return err
+	}
+
+	return writeJSON(w, http.StatusNoContent, nil)
 }
 
 func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {

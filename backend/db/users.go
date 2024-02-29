@@ -73,20 +73,6 @@ func (s *MysqlDB) GetUsers() (*[]models.User, error) {
 	return &users, nil
 }
 
-func (s *MysqlDB) DeleteUser(id string) error {
-	result, err := s.db.Exec("DELETE FROM users WHERE id = ?", id)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
-}
-
 func (s *MysqlDB) UpdateUser(id string, user *models.User) error {
 	result, err := s.db.Exec("UPDATE users SET username = ?, email = ?, password = ?, updated_at = ? WHERE id = ?",
 		user.Username, user.Email, user.Password, user.UpdatedAt, id)
@@ -97,6 +83,20 @@ func (s *MysqlDB) UpdateUser(id string, user *models.User) error {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		return ErrNotModified
+	}
+
+	return nil
+}
+
+func (s *MysqlDB) DeleteUser(id string) error {
+	result, err := s.db.Exec("DELETE FROM users WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return ErrNotFound
 	}
 
 	return nil

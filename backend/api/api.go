@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gsistelos/todo-app/db"
@@ -38,9 +39,11 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("POST /api/users/{userID}/tasks", s.jwtHandler(s.handleCreateTask))
 	router.HandleFunc("GET /api/users/{userID}/tasks", s.jwtHandler(s.handleGetTasks))
+	router.HandleFunc("GET /api/users/{userID}/tasks/{taskID}", s.jwtHandler(s.handleGetTaskByID))
+	router.HandleFunc("PUT /api/users/{userID}/tasks/{taskID}", s.jwtHandler(s.handleUpdateTask))
 	router.HandleFunc("DELETE /api/users/{userID}/tasks/{taskID}", s.jwtHandler(s.handleDeleteTask))
 
-	http.ListenAndServe(s.listenAddr, router)
+	log.Fatal(http.ListenAndServe(s.listenAddr, router))
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) error {
