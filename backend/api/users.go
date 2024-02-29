@@ -157,7 +157,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
-	tokenString, err := newJWTSignedString(user.ID, user.Username)
+	tokenString, err := newJWTSignedString(user)
 	if err != nil {
 		return err
 	}
