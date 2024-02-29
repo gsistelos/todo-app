@@ -74,16 +74,6 @@ func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error
 	return writeJSON(w, http.StatusOK, users)
 }
 
-func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
-	userID := r.PathValue("userID")
-
-	if err := s.db.DeleteUser(userID); err != nil {
-		return err
-	}
-
-	return writeJSON(w, http.StatusNoContent, nil)
-}
-
 func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) error {
 	userID := r.PathValue("userID")
 
@@ -130,6 +120,16 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	return writeJSON(w, http.StatusOK, user)
 }
 
+func (s *APIServer) handleDeleteUser(w http.ResponseWriter, r *http.Request) error {
+	userID := r.PathValue("userID")
+
+	if err := s.db.DeleteUser(userID); err != nil {
+		return err
+	}
+
+	return writeJSON(w, http.StatusNoContent, nil)
+}
+
 func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	loginReq := &models.LoginReq{}
 	if err := json.NewDecoder(r.Body).Decode(loginReq); err != nil {
@@ -157,7 +157,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
 	}
 
-	tokenString, err := newJWTSignedString(user.ID, user.Username)
+	tokenString, err := newJWTSignedString(user)
 	if err != nil {
 		return err
 	}

@@ -1,15 +1,32 @@
-import styles from "./Header.module.css";
+import Image from "next/image";
+
+import { useTheme } from "../../contexts/Theme";
+import ThemeSwitcher from "../ThemeSwitcher";
+import UserArea from "../UserArea";
 
 type Props = {
   title: string;
-  subtitle?: string;
 };
 
-const Header = ({ title, subtitle }: Props) => {
+const Header = ({ title }: Props) => {
+  const { theme, borderColor } = useTheme();
+
+  const src = theme === "dark" ? "/light-logo.png" : "/dark-logo.png";
+
   return (
-    <header className={styles.header}>
-      <h1 className={styles.title}>{title}</h1>
-      {subtitle && <h2 className={styles.subtitle}>{subtitle}</h2>}
+    <header
+      className={`flex items-center justify-between p-6 border-b ${borderColor}`}
+    >
+      <div className="flex items-center">
+        <Image className="mr-2" width={24} height={24} src={src} alt="Logo" />
+        <h1 className="text-2xl font-bold">{title}</h1>
+      </div>
+      <div className="flex items-center">
+        <nav className="mr-14">
+          <UserArea />
+        </nav>
+        <ThemeSwitcher />
+      </div>
     </header>
   );
 };

@@ -16,6 +16,7 @@ type Task struct {
 
 type TaskReq struct {
 	Description string    `json:"description"`
+	Done        bool      `json:"done"`
 	Term        time.Time `json:"term"`
 }
 
@@ -24,17 +25,24 @@ type TaskErr struct {
 	Term        string `json:"term,omitempty"`
 }
 
-func NewTask(userID int, description string, term time.Time) *Task {
+func NewTask(userID int, description string, done bool, term time.Time) *Task {
 	now := time.Now().UTC()
 
 	return &Task{
 		UserID:      userID,
 		Description: description,
-		Done:        false,
+		Done:        done,
 		Term:        term,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
+}
+
+func (s *Task) Update(description string, done bool, term time.Time) {
+	s.Description = description
+	s.Done = done
+	s.Term = term
+	s.UpdatedAt = time.Now().UTC()
 }
 
 func (s *TaskReq) Validate() *TaskErr {
