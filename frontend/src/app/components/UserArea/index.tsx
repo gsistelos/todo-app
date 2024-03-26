@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { useTheme } from "../../contexts/Theme";
-import Login from "../Login";
-import Modal from "../Modal";
-import Register from "../Register";
+import { useTheme } from '@/app/contexts/Theme';
+import { useAuth } from '@/app/contexts/Auth';
+
+import Login from '../Login';
+import Modal from '../Modal';
+import Register from '../Register';
 
 const UserArea = () => {
+  const { user, logout } = useAuth();
+
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  const { borderColor, hoverColor } = useTheme();
+  const { hoverColor } = useTheme();
 
   type Props = {
     children: React.ReactNode;
@@ -27,8 +31,17 @@ const UserArea = () => {
     );
   };
 
-  return (
-    <ul className="flex">
+  return user ? (
+    <ul className="flex gap-1">
+      <li>
+        <Button onClick={() => { }}>Profile</Button>
+      </li>
+      <li>
+        <Button onClick={logout}>Logout</Button>
+      </li>
+    </ul>
+  ) : (
+    <ul className="flex gap-1">
       <li>
         <Button onClick={() => setIsRegisterOpen(true)}>Register</Button>
         {isRegisterOpen && (
@@ -37,7 +50,6 @@ const UserArea = () => {
           </Modal>
         )}
       </li>
-      <div className={`min-h-full mx-3 border-l ${borderColor}`}></div>
       <li>
         <Button onClick={() => setIsLoginOpen(true)}>Login</Button>
         {isLoginOpen && (
@@ -47,7 +59,7 @@ const UserArea = () => {
         )}
       </li>
     </ul>
-  );
-};
+  )
+}
 
 export default UserArea;

@@ -1,11 +1,14 @@
-import Home from "./components/Home";
-import { ThemeProvider } from "./contexts/Theme";
+import Home from './components/Home';
+import { AuthProvider } from './contexts/Auth';
+import { ThemeProvider } from './contexts/Theme';
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <Home />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <Home />
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
 type ThemeContextType = {
   theme: string;
@@ -12,58 +12,50 @@ type ThemeContextType = {
   hoverColor: string;
 };
 
-const ThemeContext = createContext<ThemeContextType>({
-  theme: "",
-  toggleTheme: () => {},
-  textColor: "",
-  bgColor: "",
-  bgSecondaryColor: "",
-  borderColor: "",
-  hoverColor: "",
-});
+const ThemeContext = createContext<ThemeContextType>({} as ThemeContextType);
 
 type Props = {
   children: React.ReactNode;
 };
 
 export const ThemeProvider = ({ children }: Props) => {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState('dark');
 
   const toggleTheme = () => {
-    if (theme === "dark") {
-      setTheme("light");
-      localStorage.setItem("theme", "light");
+    if (theme === 'dark') {
+      setTheme('light');
+      localStorage.setItem('theme', 'light');
     } else {
-      setTheme("dark");
-      localStorage.setItem("theme", "dark");
+      setTheme('dark');
+      localStorage.setItem('theme', 'dark');
     }
   };
 
   useEffect(() => {
-    const localTheme = localStorage.getItem("theme");
-    if (localTheme === "light") {
+    const localTheme = localStorage.getItem('theme');
+    if (localTheme === 'light') {
       toggleTheme();
-    } else if (localTheme !== "dark") {
-      localStorage.setItem("theme", "dark");
+    } else if (localTheme !== 'dark') {
+      localStorage.setItem('theme', 'dark');
     }
   }, []);
 
   const value =
-    theme === "dark"
+    theme === 'dark'
       ? {
-          textColor: "text-white",
-          bgColor: "bg-black",
-          bgSecondaryColor: "bg-gray-800",
-          borderColor: "border-white",
-          hoverColor: "hover:bg-gray-800",
-        }
+        textColor: 'text-white',
+        bgColor: 'bg-black',
+        bgSecondaryColor: 'bg-gray-800',
+        borderColor: 'border-white',
+        hoverColor: 'hover:bg-gray-800',
+      }
       : {
-          textColor: "text-black",
-          bgColor: "bg-white",
-          bgSecondaryColor: "bg-gray-200",
-          borderColor: "border-black",
-          hoverColor: "hover:bg-gray-200",
-        };
+        textColor: 'text-black',
+        bgColor: 'bg-white',
+        bgSecondaryColor: 'bg-gray-200',
+        borderColor: 'border-black',
+        hoverColor: 'hover:bg-gray-200',
+      };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, ...value }}>
@@ -73,13 +65,8 @@ export const ThemeProvider = ({ children }: Props) => {
 };
 
 /*
- * "use client" is needed in order to use useTheme
+ * 'use client' is needed in order to use useTheme
  */
 export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
-  }
-
-  return context;
+  return useContext(ThemeContext);
 };

@@ -1,29 +1,33 @@
-import Image from "next/image";
+'use client';
 
-import { useTheme } from "../../contexts/Theme";
+import { useEffect } from 'react';
 
 type Props = {
+  onClose?: () => void;
   children: React.ReactNode;
-  onClose: () => void;
 };
 
-const Modal = ({ children, onClose }: Props) => {
-  const { theme, bgColor } = useTheme();
+const Modal = ({ onClose, children }: Props) => {
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose?.();
+      }
+    };
 
-  const src = theme === "dark" ? "/light-close.png" : "/dark-close.png";
+    document.addEventListener('keydown', handleEscape);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-50">
-      <div className="flex flex-col">
-        <button
-          className="p-2 ml-auto rounded-full hover:bg-red-500"
-          onClick={onClose}
-        >
-          <Image width={24} height={24} src={src} alt="Close" />
-        </button>
-        <div className={`p-8 mx-10 mb-10 ${bgColor} border rounded shadow-lg`}>
-          {children}
-        </div>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={onClose}>
+      <div onClick={(event) => event.stopPropagation()}>
+        {children}
       </div>
     </div>
   );

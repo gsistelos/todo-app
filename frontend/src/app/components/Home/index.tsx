@@ -1,9 +1,12 @@
-"use client";
+'use client';
 
-import { useTheme } from "../../contexts/Theme";
-import Header from "../Header";
+import { useAuth } from '@/app/contexts/Auth';
+import { useTheme } from '@/app/contexts/Theme';
+
+import Header from '../Header';
 
 const Home = () => {
+  const { user } = useAuth();
   const { bgColor, textColor } = useTheme();
 
   return (
@@ -11,7 +14,15 @@ const Home = () => {
       <Header title="Home" />
       <div className="flex flex-col items-center justify-center p-8">
         <h1>Home</h1>
-        <span>This is the Home page</span>
+        {user ? (
+          <div>
+            <h2>Welcome, {user.username}!</h2>
+          </div>
+        ) : (
+          <div>
+            <h2>Welcome, guest!</h2>
+          </div>
+        )}
       </div>
     </main>
   );

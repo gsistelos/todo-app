@@ -1,20 +1,22 @@
-import Image from "next/image";
+'use client';
 
-import { useTheme } from "../../contexts/Theme";
+import Image from 'next/image';
+
+import { useTheme } from '@/app/contexts/Theme';
 
 const ThemeSwitcher = () => {
   const { theme, toggleTheme, hoverColor } = useTheme();
 
   const { src, alt } =
-    theme === "dark"
+    theme === 'dark'
       ? {
-          src: "/light.png",
-          alt: "Light icon",
-        }
+        src: '/light.png',
+        alt: 'Light icon',
+      }
       : {
-          src: "/dark.png",
-          alt: "Dark icon",
-        };
+        src: '/dark.png',
+        alt: 'Dark icon',
+      };
 
   return (
     <button
