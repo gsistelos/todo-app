@@ -109,7 +109,10 @@ export const AuthProvider = ({ children }: Props) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
     }).catch(() => {
       throw new Error('Failed to connect to the server');
     });
