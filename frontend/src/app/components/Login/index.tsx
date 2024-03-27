@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 import { useAuth } from '@/app/contexts/Auth';
-import { useTheme } from '@/app/contexts/Theme';
 
 import FormInput from '../FormInput';
 import PasswordSwitcher from '../PasswordSwitcher';
@@ -30,17 +29,15 @@ const Login = () => {
       });
   };
 
-  const { bgColor, bgSecondaryColor, borderColor } = useTheme();
-
   return (
-    <div className={`flex flex-col ${bgColor} p-8 border ${borderColor} rounded-lg gap-4`} >
+    <div className="flex flex-col bg-primary p-8 border border-contrast rounded-lg gap-4">
       <div className="flex flex-col">
         <h1 className="text-3xl font-semibold">Login</h1>
         <span>Enter your account:</span>
       </div>
       <form className="flex flex-col items-center" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-3">
-          {formError.message && <span className="block text-red-500">{formError.message}</span>}
+          {formError.message && <span className="block text-red">{formError.message}</span>}
           <FormInput
             error={formError.email}
             placeholder="Email"
@@ -58,7 +55,7 @@ const Login = () => {
           </div>
         </div>
         <button
-          className={`${bgSecondaryColor} px-4 py-2 rounded-full hover:bg-green-500`}
+          className="bg-secondary px-4 py-2 rounded-full hover:bg-green"
           type="submit"
         >
           Login

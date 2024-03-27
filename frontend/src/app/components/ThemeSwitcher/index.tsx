@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '@/app/contexts/Theme';
 
 const ThemeSwitcher = () => {
-  const { theme, toggleTheme, hoverColor } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   const { src, alt } =
     theme === 'dark'
@@ -20,7 +20,7 @@ const ThemeSwitcher = () => {
 
   return (
     <button
-      className={`p-1 rounded-full ${hoverColor}`}
+      className="p-1 rounded-full hover:bg-secondary"
       onClick={() => toggleTheme()}
     >
       <Image width={24} height={24} src={src} alt={alt} />

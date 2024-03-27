@@ -10,7 +10,7 @@ type Props = {
 };
 
 const PasswordSwitcher = ({ show, onClick }: Props) => {
-  const { theme, hoverColor } = useTheme();
+  const { theme } = useTheme();
 
   const { srcShow, srcHide } =
     theme === 'dark'
@@ -24,7 +24,7 @@ const PasswordSwitcher = ({ show, onClick }: Props) => {
       };
 
   return (
-    <button className={`p-1 rounded-full ${hoverColor}`} type="button" onClick={onClick}>
+    <button className="p-1 rounded-full hover:bg-secondary" type="button" onClick={onClick}>
       {show ? (
         <Image width={24} height={24} src={srcShow} alt="Show password" />
       ) : (

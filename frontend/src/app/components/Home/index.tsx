@@ -7,24 +7,27 @@ import Header from '../Header';
 
 const Home = () => {
   const { user } = useAuth();
-  const { bgColor, textColor } = useTheme();
+
+  const { theme } = useTheme();
 
   return (
-    <main className={`min-h-screen ${textColor} ${bgColor}`}>
-      <Header title="Home" />
-      <div className="flex flex-col items-center justify-center p-8">
-        <h1>Home</h1>
-        {user ? (
-          <div>
-            <h2>Welcome, {user.username}!</h2>
-          </div>
-        ) : (
-          <div>
-            <h2>Welcome, guest!</h2>
-          </div>
-        )}
-      </div>
-    </main>
+    <div className={theme === "dark" ? "theme-dark" : "theme-light"}>
+      <main className="min-h-screen bg-primary text-contrast">
+        <Header title="Home" />
+        <div className="flex flex-col items-center justify-center p-8">
+          <h1>Home</h1>
+          {user ? (
+            <div>
+              <h2>Welcome, {user.username}!</h2>
+            </div>
+          ) : (
+            <div>
+              <h2>Welcome, guest!</h2>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 };
 

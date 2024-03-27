@@ -12,12 +12,12 @@ type Props = {
 };
 
 const Header = ({ title }: Props) => {
-  const { theme, borderColor } = useTheme();
+  const { theme } = useTheme();
 
   const src = theme === 'dark' ? '/light-logo.png' : '/dark-logo.png';
 
   return (
-    <header className={`flex items-center justify-between p-6 border-b ${borderColor}`}>
+    <header className="flex items-center justify-between p-6 border-b border-contrast">
       <div className="flex items-center gap-4">
         <Image width={24} height={24} src={src} alt="Logo" />
         <h1 className="text-2xl font-bold">{title}</h1>

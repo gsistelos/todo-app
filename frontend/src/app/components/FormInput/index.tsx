@@ -1,7 +1,3 @@
-'use client';
-
-import { useTheme } from '@/app/contexts/Theme';
-
 type Props = {
   error?: string;
   placeholder: string;
@@ -19,13 +15,11 @@ const FormInput = ({
   onKeyDown,
   ref
 }: Props) => {
-  const { textColor, bgSecondaryColor, borderColor } = useTheme();
-
   return (
     <div className="flex flex-col gap-1">
-      {error && <span className="block text-red-500 text-sm">{error}</span>}
+      {error && <span className="block text-red text-sm">{error}</span>}
       <input
-        className={`flex flex-col ${bgSecondaryColor} p-2 border ${borderColor} ${textColor}`}
+        className="flex flex-col bg-secondary p-2 border border-contrast"
         placeholder={placeholder}
         type={type}
         name={name}

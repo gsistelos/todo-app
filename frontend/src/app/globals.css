@@ -2,8 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer base {
+  :root {
+    --color-primary: #000000;
+    --color-secondary: #333333;
+    --color-contrast: #ffffff;
+    --color-red: #dd4040;
+    --color-green: #25aa25;
+  }
+
+  .theme-light {
+    --color-primary: #ffffff;
+    --color-secondary: #dddddd;
+    --color-contrast: #000000;
+    --color-red: #ff4040;
+    --color-green: #50ee50;
   }
 }

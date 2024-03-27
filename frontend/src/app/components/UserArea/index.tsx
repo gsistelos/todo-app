@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { useTheme } from '@/app/contexts/Theme';
 import { useAuth } from '@/app/contexts/Auth';
 
 import Login from '../Login';
@@ -13,8 +12,6 @@ const UserArea = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  const { hoverColor } = useTheme();
-
   type Props = {
     children: React.ReactNode;
     onClick: () => void;
@@ -23,7 +20,7 @@ const UserArea = () => {
   const Button = ({ children, onClick }: Props) => {
     return (
       <button
-        className={`px-4 py-2 rounded-full ${hoverColor}`}
+        className="px-4 py-2 rounded-full hover:bg-secondary"
         onClick={onClick}
       >
         {children}
