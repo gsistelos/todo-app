@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 
 import { useAuth } from '@/app/contexts/Auth';
@@ -43,7 +45,7 @@ const UserArea = () => {
         <Button onClick={() => setIsRegisterOpen(true)}>Register</Button>
         {isRegisterOpen && (
           <Modal onClose={() => setIsRegisterOpen(false)}>
-            <Register />
+            <Register onClose={() => setIsRegisterOpen(false)} />
           </Modal>
         )}
       </li>
@@ -51,7 +53,7 @@ const UserArea = () => {
         <Button onClick={() => setIsLoginOpen(true)}>Login</Button>
         {isLoginOpen && (
           <Modal onClose={() => setIsLoginOpen(false)}>
-            <Login />
+            <Login onClose={() => setIsLoginOpen(false)} />
           </Modal>
         )}
       </li>

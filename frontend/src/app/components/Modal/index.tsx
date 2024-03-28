@@ -26,7 +26,7 @@ const Modal = ({ onClose, children }: Props) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={onClose}>
-      <div onClick={(event) => event.stopPropagation()}>
+      <div className="bg-primary border border-contrast rounded-lg" onClick={(event) => event.stopPropagation()}>
         {children}
       </div>
     </div>

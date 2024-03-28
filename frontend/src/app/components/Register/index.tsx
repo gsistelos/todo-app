@@ -7,7 +7,11 @@ import { useAuth } from '@/app/contexts/Auth';
 import FormInput from '../FormInput';
 import PasswordSwitcher from '../PasswordSwitcher';
 
-const Register = () => {
+type Props = {
+  onClose: () => void;
+};
+
+const Register = ({ onClose }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [formError, setFormError] = useState({
@@ -35,13 +39,17 @@ const Register = () => {
     }
 
     register(username.value, email.value, password.value)
+      .then(() => {
+        onClose();
+      })
       .catch((error: any) => {
         setFormError(error);
+        return;
       });
   };
 
   return (
-    <div className="flex flex-col bg-primary p-8 border border-contrast rounded-lg gap-4">
+    <div className="flex flex-col p-8 gap-4">
       <div className="flex flex-col">
         <h1 className="text-3xl font-semibold">Register</h1>
         <span>Create your account:</span>
