@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 
+import ReactDOM from 'react-dom';
+
 type Props = {
   onClose?: () => void;
   children: React.ReactNode;
@@ -25,11 +27,13 @@ const Modal = ({ onClose, children }: Props) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={onClose}>
-      <div className="bg-primary border border-contrast rounded-lg" onClick={(event) => event.stopPropagation()}>
-        {children}
-      </div>
-    </div>
+    ReactDOM.createPortal(
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" onClick={onClose}>
+        <div className="bg-primary border border-contrast rounded-lg text-contrast" onClick={(event) => event.stopPropagation()}>
+          {children}
+        </div>
+      </div>,
+      document.getElementById('modal-root') as HTMLElement)
   );
 };
 
