@@ -21,6 +21,9 @@ type Token struct {
 
 func (s *APIServer) jwtHandler(f apiFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", corsOrigin)
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
 		tokenString := r.Header.Get("Authorization")
 
 		if len(tokenString) < 7 || tokenString[:7] != "Bearer " {
