@@ -15,9 +15,9 @@ func (s *APIServer) handleCreateTask(w http.ResponseWriter, r *http.Request) err
 	taskReq := &models.TaskReq{}
 	if err := json.NewDecoder(r.Body).Decode(taskReq); err != nil {
 		if errors.Is(err, io.EOF) {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: "Missing request body"})
 		} else {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: err.Error()})
 		}
 	}
 
@@ -47,7 +47,7 @@ func (s *APIServer) handleGetTasks(w http.ResponseWriter, r *http.Request) error
 	tasks, err := s.db.GetTasks(userID)
 	if err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "No tasks found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "No tasks found"})
 		} else {
 			return err
 		}
@@ -63,7 +63,7 @@ func (s *APIServer) handleGetTaskByID(w http.ResponseWriter, r *http.Request) er
 	task, err := s.db.GetTaskByID(userID, taskID)
 	if err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "Task not found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "Task not found"})
 		} else {
 			return err
 		}
@@ -76,9 +76,9 @@ func (s *APIServer) handleUpdateTask(w http.ResponseWriter, r *http.Request) err
 	taskReq := &models.TaskReq{}
 	if err := json.NewDecoder(r.Body).Decode(taskReq); err != nil {
 		if errors.Is(err, io.EOF) {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: "Missing request body"})
 		} else {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: err.Error()})
 		}
 	}
 
@@ -92,7 +92,7 @@ func (s *APIServer) handleUpdateTask(w http.ResponseWriter, r *http.Request) err
 	task, err := s.db.GetTaskByID(userID, taskID)
 	if err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "Task not found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "Task not found"})
 		} else {
 			return err
 		}
@@ -102,7 +102,7 @@ func (s *APIServer) handleUpdateTask(w http.ResponseWriter, r *http.Request) err
 
 	if err := s.db.UpdateTask(userID, taskID, task); err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "Task not found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "Task not found"})
 		} else {
 			return err
 		}
@@ -117,7 +117,7 @@ func (s *APIServer) handleDeleteTask(w http.ResponseWriter, r *http.Request) err
 
 	if err := s.db.DeleteTask(userID, taskID); err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "Task not found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "Task not found"})
 		} else {
 			return err
 		}

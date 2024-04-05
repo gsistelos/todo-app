@@ -27,7 +27,7 @@ func (s *APIServer) jwtHandler(f apiFunc) http.HandlerFunc {
 		tokenString := r.Header.Get("Authorization")
 
 		if len(tokenString) < 7 || tokenString[:7] != "Bearer " {
-			writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+			writeJSON(w, http.StatusUnauthorized, apiError{Message: "Unauthorized"})
 			return
 		}
 
@@ -38,20 +38,20 @@ func (s *APIServer) jwtHandler(f apiFunc) http.HandlerFunc {
 		user, err := s.db.GetUserByID(userID)
 		if err != nil {
 			if errors.Is(err, db.ErrNotFound) {
-				writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
+				writeJSON(w, http.StatusNotFound, apiError{Message: "User not found"})
 			} else {
-				writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+				writeJSON(w, http.StatusInternalServerError, apiError{Message: err.Error()})
 			}
 			return
 		}
 
 		if err := authenticateJWT(user, tokenString); err != nil {
-			writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+			writeJSON(w, http.StatusUnauthorized, apiError{Message: "Unauthorized"})
 			return
 		}
 
 		if err := f(w, r); err != nil {
-			writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+			writeJSON(w, http.StatusInternalServerError, apiError{Message: err.Error()})
 		}
 	}
 }

@@ -127,6 +127,8 @@ export const AuthProvider = ({ children }: Props) => {
       fetchUser(token).catch(() => {
         localStorage.removeItem('token');
       });
+    } else if (response.status === 401) {
+      throw new Error('Incorrect email or password');
     } else if (response.status > 399 && response.status < 500) {
       const data = await response.json();
       throw data;

@@ -15,9 +15,9 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) err
 	userReq := &models.UserReq{}
 	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
 		if errors.Is(err, io.EOF) {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: "Missing request body"})
 		} else {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: err.Error()})
 		}
 	}
 
@@ -52,7 +52,7 @@ func (s *APIServer) handleGetUserByID(w http.ResponseWriter, r *http.Request) er
 	user, err := s.db.GetUserByID(userID)
 	if err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "User not found"})
 		} else {
 			return err
 		}
@@ -65,7 +65,7 @@ func (s *APIServer) handleGetUsers(w http.ResponseWriter, r *http.Request) error
 	users, err := s.db.GetUsers()
 	if err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "No users found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "No users found"})
 		} else {
 			return err
 		}
@@ -81,15 +81,15 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 	if err != nil {
 		return err
 	} else if user == nil {
-		return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
+		return writeJSON(w, http.StatusNotFound, apiError{Message: "User not found"})
 	}
 
 	userReq := &models.UserReq{}
 	if err := json.NewDecoder(r.Body).Decode(userReq); err != nil {
 		if errors.Is(err, io.EOF) {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: "Missing request body"})
 		} else {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: err.Error()})
 		}
 	}
 
@@ -109,9 +109,9 @@ func (s *APIServer) handleUpdateUser(w http.ResponseWriter, r *http.Request) err
 
 	if err := s.db.UpdateUser(userID, user); err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusNotFound, apiError{Error: "User not found"})
+			return writeJSON(w, http.StatusNotFound, apiError{Message: "User not found"})
 		} else if errors.Is(err, db.ErrNotModified) {
-			return writeJSON(w, http.StatusNotModified, apiError{Error: "User not modified"})
+			return writeJSON(w, http.StatusNotModified, apiError{Message: "User not modified"})
 		} else {
 			return err
 		}
@@ -134,9 +134,9 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	loginReq := &models.LoginReq{}
 	if err := json.NewDecoder(r.Body).Decode(loginReq); err != nil {
 		if errors.Is(err, io.EOF) {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: "Missing request body"})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: "Missing request body"})
 		} else {
-			return writeJSON(w, http.StatusBadRequest, apiError{Error: err.Error()})
+			return writeJSON(w, http.StatusBadRequest, apiError{Message: err.Error()})
 		}
 	}
 
@@ -147,14 +147,14 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	user, err := s.db.GetUserByEmail(loginReq.Email)
 	if err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+			return writeJSON(w, http.StatusUnauthorized, apiError{Message: "Unauthorized"})
 		} else {
 			return err
 		}
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginReq.Password)); err != nil {
-		return writeJSON(w, http.StatusUnauthorized, apiError{Error: "Unauthorized"})
+		return writeJSON(w, http.StatusUnauthorized, apiError{Message: "Unauthorized"})
 	}
 
 	tokenString, err := newJWTSignedString(user)

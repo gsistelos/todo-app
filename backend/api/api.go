@@ -18,7 +18,7 @@ type APIServer struct {
 }
 
 type apiError struct {
-	Error string `json:"error,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
@@ -69,7 +69,7 @@ func defaultHandler(f apiFunc) http.HandlerFunc {
 		w.Header().Add("Access-Control-Allow-Headers", "Content-Type")
 
 		if err := f(w, r); err != nil {
-			writeJSON(w, http.StatusInternalServerError, apiError{Error: err.Error()})
+			writeJSON(w, http.StatusInternalServerError, apiError{Message: err.Error()})
 		}
 	}
 }
