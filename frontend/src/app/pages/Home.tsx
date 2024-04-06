@@ -1,19 +1,21 @@
 'use client';
 
-import { useAuth } from '@/app/contexts/Auth';
-import { useTheme } from '@/app/contexts/Theme';
+import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 import Header from '../components/Header';
+
+import { useAuth } from '@/app/contexts/Auth';
+import { useTheme } from '@/app/contexts/Theme';
 
 const Home = () => {
   const { user } = useAuth();
 
   const { theme } = useTheme();
 
-  const themeClass = theme === 'dark' ? 'theme-dark' : 'theme-light';
-
   return (
-    <main className={`${themeClass} bg-primary min-h-screen text-contrast`}>
+    <main className={`${theme} bg-primary min-h-screen text-contrast`}>
       <Header title="Home" />
       <div className="flex flex-col items-center justify-center p-8">
         <h1>Home</h1>
@@ -27,6 +29,19 @@ const Home = () => {
           </div>
         )}
       </div>
+      <div id="modal-root"></div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+        theme={theme}
+      />
     </main>
   );
 };

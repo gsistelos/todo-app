@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 
-import { useAuth } from '@/app/contexts/Auth';
+import { toast } from 'react-toastify';
 
 import FormInput from '../FormInput';
 import PasswordSwitcher from '../PasswordSwitcher';
+
+import { useAuth } from '@/app/contexts/Auth';
 
 type Props = {
   onClose: () => void;
@@ -41,6 +43,15 @@ const Register = ({ onClose }: Props) => {
     register(username.value, email.value, password.value)
       .then(() => {
         onClose();
+        toast.success('Registered successfully!', {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
       })
       .catch((error: any) => {
         setFormError(error);
