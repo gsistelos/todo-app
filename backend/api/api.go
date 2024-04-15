@@ -36,8 +36,11 @@ func (s *APIServer) Run(listenAddr string) error {
 	router.HandleFunc("PUT /api/users/{userID}", s.jwtHandler(s.handleUpdateUser))
 	router.HandleFunc("DELETE /api/users/{userID}", s.jwtHandler(s.handleDeleteUser))
 
-	router.HandleFunc("OPTIONS /api/login", corsHandler)
-	router.HandleFunc("POST /api/login", defaultHandler(s.handleLogin))
+	router.HandleFunc("OPTIONS /api/auth/login", corsHandler)
+	router.HandleFunc("POST /api/auth/login", defaultHandler(s.handleLogin))
+
+	router.HandleFunc("OPTIONS /api/auth/register", corsHandler)
+	router.HandleFunc("POST /api/auth/register", defaultHandler(s.handleRegister))
 
 	router.HandleFunc("OPTIONS /api/users/{userID}/tasks", corsAuthHandler)
 	router.HandleFunc("POST /api/users/{userID}/tasks", s.jwtHandler(s.handleCreateTask))
