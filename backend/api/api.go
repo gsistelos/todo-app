@@ -2,19 +2,14 @@ package api
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/gsistelos/todo-app/db"
 )
 
-var (
-	corsOrigin = "http://localhost:3000"
-)
-
 type APIServer struct {
-	listenAddr string
-	db         *db.MysqlDB
+	db *db.MysqlDB
 }
 
 type apiError struct {
@@ -23,14 +18,13 @@ type apiError struct {
 
 type apiFunc func(w http.ResponseWriter, r *http.Request) error
 
-func NewAPIServer(listenAddr string, db *db.MysqlDB) *APIServer {
+func NewAPIServer(db *db.MysqlDB) *APIServer {
 	return &APIServer{
-		listenAddr: listenAddr,
-		db:         db,
+		db: db,
 	}
 }
 
-func (s *APIServer) Run() {
+func (s *APIServer) Run(listenAddr string) error {
 	router := http.NewServeMux()
 
 	router.HandleFunc("OPTIONS /api/users", corsHandler)
@@ -54,7 +48,8 @@ func (s *APIServer) Run() {
 	router.HandleFunc("PUT /api/users/{userID}/tasks/{taskID}", s.jwtHandler(s.handleUpdateTask))
 	router.HandleFunc("DELETE /api/users/{userID}/tasks/{taskID}", s.jwtHandler(s.handleDeleteTask))
 
-	log.Fatal(http.ListenAndServe(s.listenAddr, router))
+	fmt.Println("API server listening on", listenAddr)
+	return http.ListenAndServe(listenAddr, router)
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) error {
@@ -72,16 +67,4 @@ func defaultHandler(f apiFunc) http.HandlerFunc {
 			writeJSON(w, http.StatusInternalServerError, apiError{Message: err.Error()})
 		}
 	}
-}
-
-func corsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", corsOrigin)
-	w.Header().Add("Access-Control-Allow-Headers", "Content-Type")
-	w.WriteHeader(http.StatusOK)
-}
-
-func corsAuthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", corsOrigin)
-	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	w.WriteHeader(http.StatusOK)
 }

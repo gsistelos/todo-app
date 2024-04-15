@@ -13,12 +13,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = db.Init()
-	if err != nil {
+	if err := db.Init(); err != nil {
 		log.Fatal(err)
 	}
 
-	apiServer := api.NewAPIServer(":8080", db)
+	apiServer := api.NewAPIServer(db)
 
-	apiServer.Run()
+	if err := apiServer.Run(":8080"); err != nil {
+		log.Fatal(err)
+	}
 }

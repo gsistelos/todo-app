@@ -32,7 +32,7 @@ func NewMysqlDB() (*MysqlDB, error) {
 		return nil, err
 	}
 
-	fmt.Println("Connected to MySQL")
+	fmt.Println("Connected to MySQL database")
 
 	return &MysqlDB{
 		db: db,
