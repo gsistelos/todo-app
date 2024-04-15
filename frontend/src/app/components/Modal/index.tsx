@@ -24,7 +24,7 @@ const Modal = ({ onClose, children }: Props) => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'auto';
     };
-  }, []);
+  }, [onClose]);
 
   return (
     ReactDOM.createPortal(

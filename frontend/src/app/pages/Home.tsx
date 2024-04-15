@@ -4,10 +4,10 @@ import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import Header from '../components/Header';
-
 import { useAuth } from '@/app/contexts/Auth';
 import { useTheme } from '@/app/contexts/Theme';
+
+import Header from '../components/Header';
 
 const Home = () => {
   const { user } = useAuth();

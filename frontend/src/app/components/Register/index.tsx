@@ -4,10 +4,10 @@ import { useState } from 'react';
 
 import { toast } from 'react-toastify';
 
+import { useAuth } from '@/app/contexts/Auth';
+
 import FormInput from '../FormInput';
 import PasswordSwitcher from '../PasswordSwitcher';
-
-import { useAuth } from '@/app/contexts/Auth';
 
 type Props = {
   onClose: () => void;
