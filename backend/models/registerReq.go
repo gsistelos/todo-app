@@ -31,7 +31,9 @@ func (s *RegisterReq) Validate() *RegisterErr {
 		registerErr.Password = "Password must be at least 8 characters"
 	}
 
-	if s.Password != s.ConfirmPassword {
+	if s.ConfirmPassword == "" {
+		registerErr.ConfirmPassword = "Confirm password is required"
+	} else if s.Password != s.ConfirmPassword {
 		registerErr.ConfirmPassword = "Passwords do not match"
 	}
 

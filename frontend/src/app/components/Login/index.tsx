@@ -43,7 +43,11 @@ const Login = ({ onClose }: Props) => {
         });
       })
       .catch((error: any) => {
-        setFormError(error);
+        setFormError({
+          message: error.message,
+          email: error.email,
+          password: error.password,
+        });
       });
   };
 

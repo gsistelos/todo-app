@@ -26,21 +26,12 @@ const Register = ({ onClose }: Props) => {
 
   const { register } = useAuth();
 
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const { username, email, password, confirmPassword } = e.currentTarget;
 
-    if (password.value !== confirmPassword.value) {
-      setFormError({
-        ...formError,
-        confirmPassword: 'Passwords do not match',
-      });
-      return;
-    }
-
-    register(username.value, email.value, password.value)
+    register(username.value, email.value, password.value, confirmPassword.value)
       .then(() => {
         onClose();
         toast.success('Registered successfully!', {
@@ -54,8 +45,13 @@ const Register = ({ onClose }: Props) => {
         });
       })
       .catch((error: any) => {
-        setFormError(error);
-        return;
+        setFormError({
+          message: error.message,
+          username: error.username,
+          email: error.email,
+          password: error.password,
+          confirmPassword: error.confirm_password,
+        });
       });
   };
 
@@ -71,7 +67,7 @@ const Register = ({ onClose }: Props) => {
           <FormInput error={formError.username} placeholder="Username" type="text" name="username" />
           <FormInput error={formError.email} placeholder="Email" type="email" name="email" />
           <FormInput error={formError.password} placeholder="Password" type={showPassword ? "text" : "password"} name="password" />
-          <FormInput error={formError.confirmPassword} placeholder="Confirm Password" type={showPassword ? "text" : "password"} name="confirmPassword" />
+          <FormInput error={formError.confirmPassword} placeholder="Confirm password" type={showPassword ? "text" : "password"} name="confirmPassword" />
           <div className="ml-auto">
             <PasswordSwitcher show={showPassword} onClick={() => setShowPassword(!showPassword)} />
           </div>

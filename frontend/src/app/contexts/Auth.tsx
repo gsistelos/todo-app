@@ -17,7 +17,7 @@ type User = {
 
 type AuthContextType = {
   user: User | null;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string, confirmPassword: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 };
@@ -77,8 +77,8 @@ export const AuthProvider = ({ children }: Props) => {
     }
   }, []);
 
-  const register = async (username: string, email: string, password: string): Promise<void> => {
-    const response = await fetch(`${baseURL}/users`, {
+  const register = async (username: string, email: string, password: string, confirmPassword: string): Promise<void> => {
+    const response = await fetch(`${baseURL}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -87,6 +87,7 @@ export const AuthProvider = ({ children }: Props) => {
         username: username,
         email: email,
         password: password,
+        confirm_password: confirmPassword,
       }),
     }).catch(() => {
       throw new Error('Failed to connect to the server');
@@ -104,7 +105,7 @@ export const AuthProvider = ({ children }: Props) => {
   }
 
   const login = async (email: string, password: string): Promise<void> => {
-    const response = await fetch(`${baseURL}/login`, {
+    const response = await fetch(`${baseURL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
