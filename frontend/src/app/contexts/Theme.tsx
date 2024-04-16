@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 type ThemeContextType = {
   theme: string;
@@ -16,7 +16,16 @@ type Props = {
 export const ThemeProvider = ({ children }: Props) => {
   const [theme, setTheme] = useState('dark');
 
-  const toggleTheme = useCallback(() => {
+  useEffect(() => {
+    const localTheme = localStorage.getItem('theme');
+    if (localTheme === 'light') {
+      setTheme(localTheme);
+    } else if (localTheme !== 'dark') {
+      localStorage.setItem('theme', 'dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
     if (theme === 'dark') {
       setTheme('light');
       localStorage.setItem('theme', 'light');
@@ -24,16 +33,7 @@ export const ThemeProvider = ({ children }: Props) => {
       setTheme('dark');
       localStorage.setItem('theme', 'dark');
     }
-  }, [theme, setTheme]);
-
-  useEffect(() => {
-    const localTheme = localStorage.getItem('theme');
-    if (localTheme === 'light') {
-      toggleTheme();
-    } else if (localTheme !== 'dark') {
-      localStorage.setItem('theme', 'dark');
-    }
-  }, [toggleTheme]);
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
