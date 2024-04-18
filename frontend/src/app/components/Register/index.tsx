@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 
-import { toast } from 'react-toastify';
-
 import { useAuth } from '@/app/contexts/Auth';
 
 import FormInput from '../FormInput';
@@ -15,13 +13,12 @@ type Props = {
 
 const Register = ({ onClose }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
-
-  const [formError, setFormError] = useState({
+  const [error, setError] = useState({
     message: '',
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    confirm_password: '',
   });
 
   const { register } = useAuth();
@@ -34,24 +31,9 @@ const Register = ({ onClose }: Props) => {
     register(username.value, email.value, password.value, confirmPassword.value)
       .then(() => {
         onClose();
-        toast.success('Registered successfully!', {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
       })
       .catch((error: any) => {
-        setFormError({
-          message: error.message,
-          username: error.username,
-          email: error.email,
-          password: error.password,
-          confirmPassword: error.confirm_password,
-        });
+        setError(error);
       });
   };
 
@@ -63,11 +45,11 @@ const Register = ({ onClose }: Props) => {
       </div>
       <form className="flex flex-col items-center" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-3">
-          {formError.message && <span className="block text-red">{formError.message}</span>}
-          <FormInput error={formError.username} placeholder="Username" type="text" name="username" />
-          <FormInput error={formError.email} placeholder="Email" type="email" name="email" />
-          <FormInput error={formError.password} placeholder="Password" type={showPassword ? "text" : "password"} name="password" />
-          <FormInput error={formError.confirmPassword} placeholder="Confirm password" type={showPassword ? "text" : "password"} name="confirmPassword" />
+          {error.message && <span className="block text-red">{error.message}</span>}
+          <FormInput error={error.username} placeholder="Username" type="text" name="username" />
+          <FormInput error={error.email} placeholder="Email" type="email" name="email" />
+          <FormInput error={error.password} placeholder="Password" type={showPassword ? "text" : "password"} name="password" />
+          <FormInput error={error.confirm_password} placeholder="Confirm password" type={showPassword ? "text" : "password"} name="confirmPassword" />
           <div className="ml-auto">
             <PasswordSwitcher show={showPassword} onClick={() => setShowPassword(!showPassword)} />
           </div>

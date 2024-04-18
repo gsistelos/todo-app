@@ -2,20 +2,13 @@
 
 import { createContext, useState, useEffect, useContext } from 'react';
 
-import jwt from 'jsonwebtoken';
+import { toast } from 'react-toastify';
 
-const baseURL = 'http://localhost:8080/api';
-
-type User = {
-  id: string;
-  username: string;
-  email: string;
-  password: string;
-  createdAt: string;
-  updatedAt: string;
-};
+import { fetchRegister, fetchLogin, fetchUser } from '@/api';
+import { User } from '@/types';
 
 type AuthContextType = {
+  token: string | null;
   user: User | null;
   register: (username: string, email: string, password: string, confirmPassword: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
@@ -29,124 +22,60 @@ type Props = {
 };
 
 export const AuthProvider = ({ children }: Props) => {
+  const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-
-  const fetchUser = async (token: string): Promise<void> => {
-    const decoded = jwt.decode(token);
-    if (!decoded || typeof decoded === 'string') {
-      throw new Error('Invalid authentication token');
-    }
-
-    const id = decoded.id;
-
-    const response = await fetch(`${baseURL}/users/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    }).catch(() => {
-      throw new Error('Failed to connect to the server');
-    });
-
-    if (response.status === 200) {
-      const data = await response.json();
-
-      const user = {
-        id: data.id,
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-      };
-
-      setUser(user);
-    } else if (response.status === 500) {
-      throw new Error('Internal server error');
-    } else {
-      throw new Error('Invalid authentication token');
-    }
-  }
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      fetchUser(token).catch(() => {
-        localStorage.removeItem('token');
-      });
+      setToken(token);
+
+      fetchUser({ token })
+        .then((user) => {
+          setUser(user);
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          toast.error('Failed to retrieve user data');
+        });
     }
   }, []);
 
   const register = async (username: string, email: string, password: string, confirmPassword: string): Promise<void> => {
-    const response = await fetch(`${baseURL}/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        email: email,
-        password: password,
-        confirm_password: confirmPassword,
-      }),
-    }).catch(() => {
-      throw new Error('Failed to connect to the server');
-    });
+    await fetchRegister(
+      username,
+      email,
+      password,
+      confirmPassword
+    );
 
-    if (response.status === 201) {
-    } else if (response.status > 399 && response.status < 500) {
-      const data = await response.json();
-      throw data;
-    } else if (response.status == 500) {
-      throw new Error('Internal server error');
-    } else {
-      throw new Error('Unknown error');
-    }
+    toast.success('Registered successfully!');
   }
 
   const login = async (email: string, password: string): Promise<void> => {
-    const response = await fetch(`${baseURL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    }).catch(() => {
-      throw new Error('Failed to connect to the server');
-    });
+    const token = await fetchLogin(email, password);
+    setToken(token);
 
-    if (response.status === 200) {
-      const data = await response.json();
-
-      const token = data.token;
-
-      localStorage.setItem('token', token);
-
-      fetchUser(token).catch(() => {
-        localStorage.removeItem('token');
+    const user = await fetchUser({ token })
+      .catch(() => {
+        toast.error('Failed to retrieve user data');
       });
-    } else if (response.status === 401) {
-      throw new Error('Incorrect email or password');
-    } else if (response.status > 399 && response.status < 500) {
-      const data = await response.json();
-      throw data;
-    } else if (response.status == 500) {
-      throw new Error('Internal server error');
-    } else {
-      throw new Error('Unknown error');
-    }
+    setUser(user);
+
+    localStorage.setItem('token', token);
+    toast.success('Logged in successfully!');
   }
 
   const logout = () => {
     localStorage.removeItem('token');
+    setToken(null);
     setUser(null);
+
+    toast.success('Logged out');
   }
 
   return (
-    <AuthContext.Provider value={{ user, register, login, logout }}>
+    <AuthContext.Provider value={{ token, user, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
